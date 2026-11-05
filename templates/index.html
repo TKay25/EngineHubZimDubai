@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZimOsaka AutoSpares — Engines sourced from Dubai, delivered across Zimbabwe</title>
+    <meta
+    <meta name="description" content="ZimOsaka AutoSpares sources complete engines from Dubai to order, with a full landed-cost quote covering freight, ZIMRA duty, VAT, clearing and delivery across Zimbabwe." />
+      content="ZimOsaka AutoSpares sources complete engines from Dubai to order, with a full landed-cost quote covering freight, ZIMRA duty, VAT, clearing and delivery across Zimbabwe."
+    />
+    <link rel="icon" type="image/svg+xml" href="/static/brand/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    {% if vite_dev %}
+    <script type="module" src="http://localhost:5173/@vite/client"></script>
+    <script type="module" src="http://localhost:5173/src/main.jsx"></script>
+    {% else %}
+    <link rel="stylesheet" href="{{ url_for('static', filename=assets.css) }}" />
+    <script type="module" src="{{ url_for('static', filename=assets.js) }}"></script>
+    {% endif %}
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

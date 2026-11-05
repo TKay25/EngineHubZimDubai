@@ -1,0 +1,240 @@
+/* ============================================================
+   ZimOsaka AutoSpares — Editorial Light system
+   Warm paper, near-black ink, one ink-blue accent, hairlines.
+   ============================================================ */
+
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600;700&display=swap");
+
+:root {
+  /* paper & ink ? sand & rust */
+  --paper: #f6f1e7;
+  --paper-2: #f0e8db;
+  --paper-3: #e5d9c6;
+  --card: #fdfaf4;
+  --ink: #23180f;
+  --ink-2: #4d3d2e;
+  --ink-3: #7a6753;
+  --ink-4: #a3947f;
+  --hair: #ddd0bb;
+  --hair-strong: #c8b79c;
+
+  /* single accent ? terracotta */
+  --accent: #b23a12;
+  --accent-dark: #8d2d0e;
+  --accent-wash: #f6e3d9;
+
+  /* signal colours (data only, never decoration) */
+  --ok: #2f5d3a;
+  --ok-wash: #e4ede4;
+  --warn: #8a5a06;
+  --warn-wash: #f6ead2;
+  --danger: #9a2b1f;
+  --danger-wash: #f6e0d9;
+
+  --font-display: "Archivo", "Inter Tight", system-ui, sans-serif;
+  --font-body: "Inter Tight", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --container: 1320px;
+  --gutter: clamp(18px, 4vw, 56px);
+  --rule: 1px solid var(--hair);
+  --radius-sm: 2px;
+  --radius: 4px;
+  --radius-pill: 999px;
+  --shadow-card: 0 1px 0 var(--hair), 0 18px 40px -32px rgba(20, 19, 15, 0.55);
+  --shadow-pop: 0 24px 60px -28px rgba(20, 19, 15, 0.5);
+
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --header-h: 76px;
+}
+
+* { box-sizing: border-box; }
+*::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  font-feature-settings: "ss01" 1, "cv11" 1;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* paper grain */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image: radial-gradient(rgba(20, 19, 15, 0.14) 0.5px, transparent 0.5px);
+  background-size: 3px 3px;
+  mix-blend-mode: multiply;
+}
+
+#root { position: relative; z-index: 1; }
+
+h1, h2, h3, h4, h5 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+  margin: 0 0 0.4em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+h1 { font-size: clamp(2.6rem, 7vw, 5.6rem); }
+h2 { font-size: clamp(1.9rem, 4vw, 3.2rem); }
+h3 { font-size: clamp(1.05rem, 1.6vw, 1.35rem); letter-spacing: -0.02em; }
+h4 { font-size: 0.95rem; letter-spacing: -0.01em; }
+
+.serif {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+p { margin: 0 0 1rem; text-wrap: pretty; }
+a { color: var(--ink); text-decoration: none; }
+a:hover { color: var(--accent); }
+
+button { font-family: inherit; }
+::selection { background: var(--ink); color: var(--paper); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+img, svg { display: block; max-width: 100%; }
+
+.container {
+  width: min(var(--container), calc(100vw - var(--gutter) * 2));
+  margin-inline: auto;
+}
+.container.narrow { width: min(620px, calc(100vw - var(--gutter) * 2)); }
+.container.wide { width: min(1560px, calc(100vw - var(--gutter) * 2)); }
+
+.page { padding: clamp(2rem, 5vw, 4rem) 0 clamp(4rem, 8vw, 7rem); }
+.section { padding: clamp(3rem, 7vw, 6rem) 0 0; }
+
+/* ---- shared type utilities ---- */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.eyebrow::before {
+  content: "";
+  width: 26px;
+  height: 1px;
+  background: var(--ink);
+}
+
+.lede {
+  font-size: clamp(1.02rem, 1.5vw, 1.2rem);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 62ch;
+}
+
+.muted { color: var(--ink-3); }
+.small { font-size: 0.86rem; }
+.fineprint { font-size: 0.76rem; color: var(--ink-3); margin-top: 0.9rem; max-width: 52ch; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.nowrap { white-space: nowrap; }
+.wrap { max-width: 340px; white-space: normal; }
+hr { border: 0; border-top: var(--rule); margin: 1.6rem 0; }
+
+.rule { border: 0; border-top: var(--rule); margin: 0; }
+
+/* section header pattern: big type left, quiet action right */
+.section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-bottom: 1.4rem;
+  margin-bottom: 2.4rem;
+  border-bottom: 1px solid var(--ink);
+  flex-wrap: wrap;
+}
+.section-head h2 { margin: 0; }
+.section-head .meta {
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-bottom: 1.6rem;
+  margin-bottom: 2.4rem;
+  border-bottom: 1px solid var(--ink);
+  flex-wrap: wrap;
+}
+.page-head h1 { margin-bottom: 0.2rem; }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.spinner {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+.loading-state {
+  display: flex;
+  min-height: 12rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: var(--ink-3);
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.loading-state.compact { min-height: 3rem; justify-content: flex-start; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
