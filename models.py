@@ -354,6 +354,7 @@ class Payment(db.Model):
     method = db.Column(db.String(32), nullable=False)
     amount_usd = db.Column(db.Numeric(12, 2), nullable=False)
     status = db.Column(db.String(24), nullable=False, default="pending")
+    merchant_reference = db.Column(db.String(80), unique=True, index=True)
     reference = db.Column(db.String(80))
     proof_filename = db.Column(db.String(255))
     admin_note = db.Column(db.String(255))

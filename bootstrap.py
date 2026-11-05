@@ -115,6 +115,21 @@ def _add_missing_columns():
             "orders_fulfilled": "INTEGER DEFAULT 0",
         },
     )
+    add(
+        "payments",
+        {
+            "merchant_reference": "VARCHAR(80)",
+        },
+    )
+
+    from sqlalchemy import Index
+    from models import Payment
+
+    Index(
+        "ix_payments_merchant_reference",
+        Payment.merchant_reference,
+        unique=True,
+    ).create(db.engine, checkfirst=True)
 
 
 if __name__ == "__main__":

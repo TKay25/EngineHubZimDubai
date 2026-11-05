@@ -24,13 +24,50 @@ export default function Home() {
   const [featured, setFeatured] = useState([]);
   const [featuredLoading, setFeaturedLoading] = useState(true);
   const [featuredError, setFeaturedError] = useState("");
+  const [example, setExample] = useState(null);
+  const [exampleEstimate, setExampleEstimate] = useState(null);
+  const [exampleLoading, setExampleLoading] = useState(true);
+  const [exampleError, setExampleError] = useState("");
+  const [leadRange, setLeadRange] = useState(null);
 
   useEffect(() => {
     let active = true;
     api("/engines?sort=featured")
-      .then((res) => active && setFeatured(res.engines.slice(0, 3)))
-      .catch((err) => active && setFeaturedError(err.message))
-      .finally(() => active && setFeaturedLoading(false));
+      .then(async (res) => {
+        if (!active) return;
+        const available = res.engines.filter((engine) => engine.sourcing_available);
+        setFeatured(available.slice(0, 3));
+        const leadDays = available.map((engine) => Number(engine.typical_lead_days)).filter(Number.isFinite);
+        if (leadDays.length) setLeadRange([Math.min(...leadDays), Math.max(...leadDays)]);
+        setFeaturedLoading(false);
+        const sample = available.find((engine) => engine.model_code === "1HZ") || available[0];
+        setExample(sample || null);
+        if (!sample) {
+          setExampleLoading(false);
+          return;
+        }
+        try {
+          const estimate = await api("/quote-estimate", {
+            method: "POST",
+            body: { goods_total: sample.guide_price_usd },
+          });
+          if (active) setExampleEstimate(estimate.estimate);
+        } catch (err) {
+          if (active) setExampleError(err.message);
+        }
+      })
+      .catch((err) => {
+        if (active) {
+          setFeaturedError(err.message);
+          setExampleError(err.message);
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setFeaturedLoading(false);
+          setExampleLoading(false);
+        }
+      });
     return () => {
       active = false;
     };
@@ -63,22 +100,43 @@ export default function Home() {
               </div>
             </div>
 
-            <aside className="specimen">
-              <div className="specimen-head">
-                <h3>Toyota 1HZ</h3>
-                <span className="code">4164 cc · diesel</span>
-              </div>
-              <ul className="specimen-rows">
-                <li><span>Supplier price, Dubai</span><strong>USD 4,200</strong></li>
-                <li><span>Sea freight + insurance</span><strong>USD 697</strong></li>
-                <li><span>Duty, VAT, surtax</span><strong>USD 1,469</strong></li>
-                <li><span>Clearing + inland</span><strong>USD 800</strong></li>
-                <li className="total"><span>Landed in Harare</span><strong>USD 7,166</strong></li>
-              </ul>
-              <div className="specimen-foot">
-                <span>Deposit 50% · USD 3,583</span>
-                <Link className="textlink" to="/calculator">Adjust</Link>
-              </div>
+            <aside className="specimen" aria-live="polite">
+              {exampleLoading ? (
+                <LoadingState compact label="Building a live landed-cost example…" />
+              ) : example ? (
+                <>
+                  <div className="specimen-head">
+                    <h3>{example.title}</h3>
+                    <span className="code">
+                      {example.displacement_cc ? `${example.displacement_cc.toLocaleString()} cc` : example.model_code} · {example.fuel}
+                    </span>
+                  </div>
+                  {exampleEstimate ? (
+                    <>
+                      <ul className="specimen-rows">
+                        <li><span>Supplier price guide</span><strong>{money(exampleEstimate.goods_total)}</strong></li>
+                        <li><span>Freight + insurance</span><strong>{money(exampleEstimate.freight + exampleEstimate.insurance)}</strong></li>
+                        <li><span>Duty, VAT + surtax</span><strong>{money(exampleEstimate.duty + exampleEstimate.vat + exampleEstimate.surtax)}</strong></li>
+                        <li><span>Clearing + inland</span><strong>{money(exampleEstimate.clearing + exampleEstimate.inland)}</strong></li>
+                        <li className="total"><span>Indicative landed total</span><strong>{money(exampleEstimate.total)}</strong></li>
+                      </ul>
+                      <div className="specimen-foot">
+                        <span>Indicative only · proforma confirms the final price</span>
+                        <Link className="textlink" to="/calculator">Adjust</Link>
+                      </div>
+                    </>
+                  ) : (
+                    <p className="alert">{exampleError || "The landed-cost example is temporarily unavailable."}</p>
+                  )}
+                </>
+              ) : (
+                <div className="specimen-empty">
+                  <p className="eyebrow">Catalogue awaiting updates</p>
+                  <h3>Need a particular engine?</h3>
+                  <p className="muted">Send us the engine code or vehicle and our sourcing desk can check availability.</p>
+                  <Link className="btn primary" to="/checkout">Request a quote</Link>
+                </div>
+              )}
             </aside>
           </div>
 
@@ -87,10 +145,10 @@ export default function Home() {
           </div>
 
           <div className="metrics">
-            <div><strong>72h</strong><span>Quote turnaround</span></div>
-            <div><strong>7–45d</strong><span>Typical lead time</span></div>
-            <div><strong>100%</strong><span>Landed cost stated</span></div>
-            <div><strong>3</strong><span>Ways to pay</span></div>
+            <div><strong>Pre-order</strong><span>Sourcing model</span></div>
+            <div><strong>{leadRange ? `${leadRange[0]}–${leadRange[1]}d` : "—"}</strong><span>Catalogue lead-time range</span></div>
+            <div><strong>USD</strong><span>Quote currency</span></div>
+            <div><strong>Before payment</strong><span>Full landed quote</span></div>
           </div>
         </div>
       </section>

@@ -4,10 +4,11 @@ Paynow is the primary driver and also reaches EcoCash/OneMoney/ZIPIT/Visa/MC.
 Bank transfers wait for admin confirmation of a proof-of-payment upload.
 """
 import hashlib
+import hmac
 import os
 import uuid
 from datetime import datetime, timezone
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 import requests
 from flask import Blueprint, current_app, jsonify, request, session, send_from_directory
@@ -39,7 +40,7 @@ def init_paynow_payment(payment, order):
     cfg = current_app.config
     payload = {
         "id": cfg["PAYNOW_INTEGRATION_ID"],
-        "reference": order.reference,
+        "reference": payment.merchant_reference,
         "amount": f"{float(payment.amount_usd):.2f}",
         "additionalinfo": f"EngineHub order {order.reference}",
         "returnurl": cfg["PAYNOW_RETURN_URL"] or request.host_url.rstrip("/") + "/orders",
@@ -82,33 +83,50 @@ def payment_methods():
 @bp.post("/orders/<reference>/payments")
 @login_required
 def create_payment(reference):
-    order = Order.query.filter_by(reference=reference).first()
+    order = Order.query.filter_by(reference=reference).with_for_update().first()
     if not order:
         return api_error("Order not found.", 404)
     user = current_user()
     if order.customer_id != user.id and not user.is_admin:
         return api_error("You do not have access to this order.", 403)
-    if order.status in ("quote_requested", "cancelled"):
+    if order.status in ("quote_requested", "cancelled", "delivered"):
         return api_error("This order is not ready for payment yet.")
 
     data = request.get_json(silent=True) or {}
     method = data.get("method")
     if method not in PAYMENT_METHODS:
         return api_error("Choose a valid payment method.")
+    committed = sum(
+        (
+            Decimal(str(payment.amount_usd or 0))
+            for payment in order.payments
+            if payment.status in ("pending", "proof_submitted")
+        ),
+        Decimal("0"),
+    )
+    balance_due = Decimal(str(order.balance_due))
+    available = max(balance_due - committed, Decimal("0")).quantize(Decimal("0.01"))
+    deposit_remaining = max(
+        Decimal(str(order.deposit_due)) - Decimal(str(order.paid_total)) - committed,
+        Decimal("0"),
+    ).quantize(Decimal("0.01"))
+    default_amount = deposit_remaining if deposit_remaining > 0 else available
     try:
-        amount = Decimal(str(data.get("amount_usd") or order.deposit_due)).quantize(
+        amount = Decimal(str(data.get("amount_usd") or default_amount)).quantize(
             Decimal("0.01")
         )
-    except Exception:
+    except (InvalidOperation, ValueError):
         return api_error("Payment amount must be a number.")
-    if amount <= 0:
+    if not amount.is_finite() or amount <= 0:
         return api_error("Payment amount must be greater than zero.")
-    if method == "cash_on_delivery" and amount > order.total:
-        return api_error("Amount exceeds the order total.")
+    if amount > available:
+        return api_error("Payment amount exceeds the remaining amount available to pay.")
 
     payment = Payment(order_id=order.id, method=method, amount_usd=amount, status="pending")
     db.session.add(payment)
     db.session.flush()
+    if method == "paynow":
+        payment.merchant_reference = f"{order.reference}-{payment.id}"
 
     redirect_url = None
     if method == "paynow":
@@ -216,24 +234,43 @@ def paynow_result():
     if not _paynow_ready():
         return "Paynow not configured", 503
     received = data.pop("hash", "").upper()
-    if received != paynow_hash(data, cfg["PAYNOW_INTEGRATION_KEY"]):
+    expected = paynow_hash(data, cfg["PAYNOW_INTEGRATION_KEY"])
+    if not hmac.compare_digest(received, expected):
         current_app.logger.warning("Paynow hash mismatch for %s", data.get("reference"))
         return "Invalid hash", 400
 
-    reference = data.get("reference", "")
-    order = Order.query.filter_by(reference=reference).first()
-    if not order:
-        return "Unknown order", 404
-    payment = (
-        Payment.query.filter_by(order_id=order.id)
-        .order_by(Payment.created_at.desc())
-        .first()
-    )
+    merchant_reference = data.get("reference", "")
+    payment = Payment.query.filter_by(
+        merchant_reference=merchant_reference
+    ).first()
     if not payment:
-        return "Unknown payment", 404
+        legacy_order = Order.query.filter_by(reference=merchant_reference).first()
+        if legacy_order:
+            legacy_payments = Payment.query.filter_by(
+                order_id=legacy_order.id,
+                method="paynow",
+                merchant_reference=None,
+                status="pending",
+            ).all()
+            if len(legacy_payments) == 1:
+                payment = legacy_payments[0]
+        if not payment:
+            return "Unknown payment", 404
+    order = payment.order
 
     status = (data.get("status") or "").strip().lower()
     if status == "paid":
+        try:
+            paid_amount = Decimal(str(data.get("amount", ""))).quantize(Decimal("0.01"))
+        except (InvalidOperation, ValueError):
+            return "Invalid amount", 400
+        if paid_amount != Decimal(str(payment.amount_usd)).quantize(Decimal("0.01")):
+            current_app.logger.warning(
+                "Paynow amount mismatch for payment %s", payment.id
+            )
+            return "Invalid amount", 400
+        if payment.status == "confirmed":
+            return "ok", 200
         payment.status = "confirmed"
         payment.confirmed_at = datetime.now(timezone.utc)
         payment.reference = data.get("paynowreference") or payment.reference

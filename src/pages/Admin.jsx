@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import Modal from "../components/Modal";
 import { api, dateShort, money } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { LoadingButton, LoadingState } from "../components/Loading";
@@ -167,15 +168,17 @@ export default function Admin() {
             </table>
           </div>
           {open && (
-            <OrderPanel
-              order={open}
-              onDone={(msg, updated) => {
-                setNotice(msg);
-                if (updated) setOpen(updated);
-                load();
-              }}
-              onError={setError}
-            />
+            <Modal title={`Manage request ${open.reference}`} onClose={() => setOpen(null)} className="admin-dialog">
+              <OrderPanel
+                order={open}
+                onDone={(msg, updated) => {
+                  setNotice(msg);
+                  if (updated) setOpen(updated);
+                  load();
+                }}
+                onError={setError}
+              />
+            </Modal>
           )}
         </>
       )}
@@ -276,6 +279,7 @@ function CatalogAdmin({ engines, onDone, onError }) {
   const [editing, setEditing] = useState(null);
   const [busy, setBusy] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const set = (key) => (e) =>
     setDraft((d) => ({
@@ -314,11 +318,11 @@ function CatalogAdmin({ engines, onDone, onError }) {
   }
 
   async function remove(engine) {
-    if (!window.confirm(`Delete ${engine.title}? This cannot be undone.`)) return;
     setDeletingId(engine.id);
     try {
       await api(`/admin/engines/${engine.id}`, { method: "DELETE" });
       onDone("Engine type deleted.");
+      setDeleteTarget(null);
     } catch (err) {
       onError(err.message);
     } finally {
@@ -327,6 +331,7 @@ function CatalogAdmin({ engines, onDone, onError }) {
   }
 
   return (
+    <>
     <div className="panel">
       <div className="section-head" style={{ marginBottom: "1.5rem" }}>
         <div>
@@ -387,9 +392,9 @@ function CatalogAdmin({ engines, onDone, onError }) {
                 <td>{e.sourcing_available ? <span className="pill ok">Live</span> : <span className="pill muted">Paused</span>}</td>
                 <td className="nowrap">
                   <button type="button" className="link-btn" onClick={() => edit(e)}>Edit</button>
-                  <LoadingButton type="button" className="link-btn" style={{ marginLeft: "0.8rem" }} onClick={() => remove(e)} loading={deletingId === e.id} loadingLabel="Deleting…">
+                  <button type="button" className="link-btn" style={{ marginLeft: "0.8rem" }} onClick={() => setDeleteTarget(e)}>
                     Delete
-                  </LoadingButton>
+                  </button>
                 </td>
               </tr>
             ))}
@@ -397,6 +402,25 @@ function CatalogAdmin({ engines, onDone, onError }) {
         </table>
       </div>
     </div>
+    {deleteTarget && (
+      <Modal title="Delete engine type" onClose={() => !deletingId && setDeleteTarget(null)} className="notice-dialog">
+        <div className="dialog-content">
+          <p className="eyebrow">Remove from catalogue</p>
+          <h2>Delete this engine type?</h2>
+          <p><strong>{deleteTarget.title}</strong></p>
+          <p className="muted">This can’t be undone. If the engine appears on an order, the system will prevent deletion.</p>
+          <div className="dialog-actions">
+            <LoadingButton className="btn accent" onClick={() => remove(deleteTarget)} loading={deletingId === deleteTarget.id} loadingLabel="Deleting…">
+              Delete engine
+            </LoadingButton>
+            <button type="button" className="btn" disabled={Boolean(deletingId)} onClick={() => setDeleteTarget(null)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      </Modal>
+    )}
+    </>
   );
 }
 

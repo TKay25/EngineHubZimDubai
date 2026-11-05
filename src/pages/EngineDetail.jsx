@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import CostBreakdown from "../components/CostBreakdown";
 import { EngineArt } from "../components/EngineFinder";
+import Modal from "../components/Modal";
 import { api, money } from "../lib/api";
 import { useCart } from "../lib/cart";
 import { LoadingState } from "../components/Loading";
@@ -15,6 +16,7 @@ export default function EngineDetail() {
   const [quantity, setQuantity] = useState(1);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [added, setAdded] = useState(null);
 
   useEffect(() => {
     let active = true;
@@ -43,7 +45,13 @@ export default function EngineDetail() {
   if (error) return <div className="container page"><p className="alert">{error}</p></div>;
   if (loading || !engine) return <div className="container page"><LoadingState label="Loading engine details…" /></div>;
 
+  function addToRequest() {
+    add(engine, quantity);
+    setAdded({ title: engine.title, quantity });
+  }
+
   return (
+    <>
     <div className="container page">
       <Link to="/engines" className="back">← Catalogue</Link>
 
@@ -116,7 +124,7 @@ export default function EngineDetail() {
                 onChange={(e) => setQuantity(Math.max(1, Math.min(Number(e.target.value) || 1, 20)))}
               />
             </label>
-            <button className="btn primary" onClick={() => add(engine, quantity)}>
+            <button className="btn primary" onClick={addToRequest}>
               Add to request
             </button>
             <Link className="btn" to="/checkout">Review request</Link>
@@ -171,5 +179,20 @@ export default function EngineDetail() {
         </section>
       )}
     </div>
+    {added && (
+      <Modal title="Added to your request" onClose={() => setAdded(null)} className="notice-dialog">
+        <div className="dialog-content">
+          <p className="eyebrow">Request updated</p>
+          <h2>Added to your request</h2>
+          <p><strong>{added.title}</strong> · quantity {added.quantity}</p>
+          <p className="muted">Your request is saved on this device. Review it when you’re ready; nothing is ordered until you submit the quote request.</p>
+          <div className="dialog-actions">
+            <Link className="btn primary" to="/checkout">Review request</Link>
+            <button className="btn" type="button" onClick={() => setAdded(null)}>Keep browsing</button>
+          </div>
+        </div>
+      </Modal>
+    )}
+    </>
   );
 }

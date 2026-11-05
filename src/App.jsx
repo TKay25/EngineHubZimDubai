@@ -25,6 +25,7 @@ function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const [signOutError, setSignOutError] = useState("");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 6);
@@ -35,6 +36,7 @@ function Header() {
 
   useEffect(() => {
     window.scrollTo({ top: 0 });
+    setMenuOpen(false);
   }, [location.pathname]);
 
   async function signOut() {
@@ -53,7 +55,19 @@ function Header() {
     <header className={`site-header ${scrolled ? "scrolled" : ""}`}>
       <div className="container header-inner">
         <Brand />
-        <nav className="nav" aria-label="Main">
+        <button
+          className="menu-toggle"
+          type="button"
+          aria-expanded={menuOpen}
+          aria-controls="primary-navigation"
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          <span className="sr-only">{menuOpen ? "Close menu" : "Open menu"}</span>
+          <span className={`menu-icon${menuOpen ? " open" : ""}`} aria-hidden="true">
+            <i /><i /><i />
+          </span>
+        </button>
+        <nav id="primary-navigation" className={`nav${menuOpen ? " open" : ""}`} aria-label="Main">
           <NavLink to="/engines">Engines</NavLink>
           <NavLink to="/calculator">Landed cost</NavLink>
           <NavLink to="/how-it-works">How it works</NavLink>
@@ -62,6 +76,18 @@ function Header() {
           <Link className="nav-request" to="/checkout">
             Request{count > 0 && <span className="badge">{count}</span>}
           </Link>
+          <div className="nav-auth">
+            {user ? (
+              <LoadingButton className="btn small" onClick={signOut} loading={signingOut} loadingLabel="Signing out…">
+                Sign out
+              </LoadingButton>
+            ) : (
+              <>
+                <Link className="btn quiet small" to="/login" state={{ backgroundLocation }}>Sign in</Link>
+                <Link className="btn small" to="/register" state={{ backgroundLocation }}>Create account</Link>
+              </>
+            )}
+          </div>
         </nav>
         <div className="header-actions">
           {loading ? (

@@ -3,8 +3,17 @@ import { createPortal } from "react-dom";
 
 export default function Modal({ title, onClose, children, className = "" }) {
   const dialogRef = useRef(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
+    const focusTarget = dialogRef.current?.querySelector("input, select, textarea") ||
+      dialogRef.current?.querySelector("button, a");
+    focusTarget?.focus();
+  }, [title]);
+
+  useEffect(() => {
+    const previousFocus = document.activeElement;
     const previousOverflow = document.body.style.overflow;
     const root = document.getElementById("root");
     const wasInert = root?.inert ?? false;
@@ -19,7 +28,7 @@ export default function Modal({ title, onClose, children, className = "" }) {
     function onKeyDown(event) {
       if (event.key === "Escape") {
         event.preventDefault();
-        onClose();
+        onCloseRef.current();
         return;
       }
       if (event.key !== "Tab" || !dialog) return;
@@ -48,14 +57,15 @@ export default function Modal({ title, onClose, children, className = "" }) {
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = previousOverflow;
       if (root) root.inert = wasInert;
+      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus();
     };
-  }, [onClose]);
+  }, []);
 
   return createPortal(
     <div
       className="modal-backdrop"
       onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onClose();
+        if (event.target === event.currentTarget) onCloseRef.current();
       }}
     >
       <section

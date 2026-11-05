@@ -1,19 +1,15 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { api, dateShort, money } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { LoadingState } from "../components/Loading";
 
 export default function Account() {
   const { user, loading } = useAuth();
-  const navigate = useNavigate();
+  const location = useLocation();
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    if (!loading && !user) navigate("/login", { state: { next: "/account" } });
-  }, [loading, user, navigate]);
 
   useEffect(() => {
     if (!user) return;
@@ -28,7 +24,23 @@ export default function Account() {
     };
   }, [user]);
 
-  if (loading || !user) return <div className="container page"><LoadingState label="Loading your account…" /></div>;
+  if (loading) return <div className="container page"><LoadingState label="Loading your account…" /></div>;
+  if (!user) {
+    return (
+      <div className="container page narrow">
+        <p className="eyebrow">My account</p>
+        <h1>Sign in to continue</h1>
+        <p className="lede">Your orders, quotes, and payment history are available after you sign in.</p>
+        <Link
+          className="btn primary"
+          to="/login"
+          state={{ next: "/account", backgroundLocation: location }}
+        >
+          Sign in
+        </Link>
+      </div>
+    );
+  }
 
   const open = orders.filter((o) => !["delivered", "cancelled"].includes(o.status));
   const closed = orders.filter((o) => ["delivered", "cancelled"].includes(o.status));

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import CostBreakdown from "../components/CostBreakdown";
+import Modal from "../components/Modal";
 import { api, money } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { useCart } from "../lib/cart";
@@ -9,7 +10,6 @@ import { LoadingButton, LoadingState } from "../components/Loading";
 export default function Checkout() {
   const { items, total, setQuantity, remove, clear } = useCart();
   const { user } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
   const [estimate, setEstimate] = useState(null);
   const [estimateLoading, setEstimateLoading] = useState(false);
@@ -18,6 +18,7 @@ export default function Checkout() {
   const [customBusy, setCustomBusy] = useState(false);
   const [error, setError] = useState("");
   const [custom, setCustom] = useState({ name: "", phone: "", make: "", details: "" });
+  const [createdOrder, setCreatedOrder] = useState(null);
   const [customSent, setCustomSent] = useState(false);
 
   useEffect(() => {
@@ -57,7 +58,7 @@ export default function Checkout() {
         },
       });
       clear();
-      navigate(`/orders/${res.order.reference}`);
+      setCreatedOrder(res.order);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -88,6 +89,7 @@ export default function Checkout() {
   };
 
   return (
+    <>
     <div className="container page">
       <div className="page-head">
         <div>
@@ -191,10 +193,7 @@ export default function Checkout() {
             <p style={{ marginBottom: "0.9rem" }}>
               Send the details and our Dubai desk will source it.
             </p>
-            {customSent ? (
-              <p className="success" style={{ margin: 0 }}>Request sent. We&apos;ll be in touch.</p>
-            ) : (
-              <form className="stack-form" onSubmit={sendCustom}>
+            <form className="stack-form" onSubmit={sendCustom}>
                 <input required placeholder="Your name" value={custom.name} onChange={setC("name")} />
                 <input required placeholder="WhatsApp number" value={custom.phone} onChange={setC("phone")} />
                 <input placeholder="Vehicle / make" value={custom.make} onChange={setC("make")} />
@@ -202,11 +201,35 @@ export default function Checkout() {
                 <LoadingButton className="btn small" loading={customBusy} loadingLabel="Sending request…">
                   Send request
                 </LoadingButton>
-              </form>
-            )}
+            </form>
           </div>
         </aside>
       </div>
     </div>
+    {createdOrder && (
+      <Modal title="Request submitted" onClose={() => setCreatedOrder(null)} className="notice-dialog">
+        <div className="dialog-content">
+          <p className="eyebrow">Sourcing request received</p>
+          <h2>We’ll confirm availability</h2>
+          <p>Your reference is <strong className="mono">{createdOrder.reference}</strong>.</p>
+          <p className="muted">No payment has been taken. We’ll send your proforma once the Dubai desk confirms the engine.</p>
+          <div className="dialog-actions">
+            <Link className="btn primary" to={`/orders/${createdOrder.reference}`}>View request</Link>
+            <button className="btn" type="button" onClick={() => setCreatedOrder(null)}>Continue browsing</button>
+          </div>
+        </div>
+      </Modal>
+    )}
+    {customSent && (
+      <Modal title="Quote request sent" onClose={() => setCustomSent(false)} className="notice-dialog">
+        <div className="dialog-content">
+          <p className="eyebrow">Custom sourcing request</p>
+          <h2>Thanks — we have your details</h2>
+          <p className="muted">Our sourcing desk will review your engine requirements and contact you.</p>
+          <button className="btn primary" type="button" onClick={() => setCustomSent(false)}>Done</button>
+        </div>
+      </Modal>
+    )}
+    </>
   );
 }
