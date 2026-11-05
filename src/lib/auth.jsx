@@ -63,6 +63,11 @@ export function AuthProvider({ children }) {
         setUser(res.user);
         return res.user;
       },
+      async updateProfile(payload) {
+        const res = await api("/auth/profile", { method: "PATCH", body: payload });
+        setUser(res.user);
+        return res.user;
+      },
       loadSite,
     }),
     [user, site, loading, loadSite]

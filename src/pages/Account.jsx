@@ -2,14 +2,42 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { api, dateShort, money } from "../lib/api";
 import { useAuth } from "../lib/auth";
-import { LoadingState } from "../components/Loading";
+import Modal from "../components/Modal";
+import { LoadingButton, LoadingState } from "../components/Loading";
 
 export default function Account() {
-  const { user, loading } = useAuth();
+  const { user, loading, updateProfile } = useAuth();
   const location = useLocation();
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [error, setError] = useState("");
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [profileBusy, setProfileBusy] = useState(false);
+  const [profileError, setProfileError] = useState("");
+  const [profileNotice, setProfileNotice] = useState("");
+  const [profile, setProfile] = useState({ name: "", phone: "" });
+
+  function editProfile() {
+    setProfile({ name: user.name || "", phone: user.phone || "" });
+    setProfileError("");
+    setProfileNotice("");
+    setProfileOpen(true);
+  }
+
+  async function saveProfile(event) {
+    event.preventDefault();
+    setProfileBusy(true);
+    setProfileError("");
+    try {
+      await updateProfile(profile);
+      setProfileNotice("Your contact details have been updated.");
+      setProfileOpen(false);
+    } catch (err) {
+      setProfileError(err.message);
+    } finally {
+      setProfileBusy(false);
+    }
+  }
 
   useEffect(() => {
     if (!user) return;
@@ -76,10 +104,51 @@ export default function Account() {
           <h1>{user.name}</h1>
           <p className="muted">{user.email} · {user.phone || "no phone on file"}</p>
         </div>
-        <Link className="btn primary" to="/engines">Request another engine</Link>
+        <div className="hero-actions">
+          <button className="btn" type="button" onClick={editProfile}>Edit contact details</button>
+          <Link className="btn primary" to="/engines">Request another engine</Link>
+        </div>
       </div>
 
+      {profileNotice && <p className="success" role="status">{profileNotice}</p>}
       {error && <p className="alert">{error}</p>}
+
+      {profileOpen && (
+        <Modal title="Edit contact details" onClose={() => setProfileOpen(false)} className="auth-dialog">
+          <div className="auth-card">
+            <p className="eyebrow">Account details</p>
+            <h2>Keep your contact details current</h2>
+            <p className="muted">We use these details for quotes and updates about your requests.</p>
+            {profileError && <p className="alert" role="alert">{profileError}</p>}
+            <form className="stack-form" onSubmit={saveProfile}>
+              <label>
+                Full name
+                <input
+                  autoComplete="name"
+                  required
+                  minLength={2}
+                  value={profile.name}
+                  onChange={(event) => setProfile((current) => ({ ...current, name: event.target.value }))}
+                />
+              </label>
+              <label>
+                Mobile / WhatsApp number
+                <input
+                  autoComplete="tel"
+                  type="tel"
+                  required
+                  value={profile.phone}
+                  onChange={(event) => setProfile((current) => ({ ...current, phone: event.target.value }))}
+                />
+              </label>
+              <p className="small muted">Email address: {user.email} (cannot be changed here)</p>
+              <LoadingButton className="btn primary full" loading={profileBusy} loadingLabel="Saving details…">
+                Save contact details
+              </LoadingButton>
+            </form>
+          </div>
+        </Modal>
+      )}
 
       {ordersLoading ? (
         <LoadingState label="Loading your orders…" />
