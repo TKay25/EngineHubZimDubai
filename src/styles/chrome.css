@@ -82,6 +82,54 @@
 .link-btn:hover { color: var(--accent-dark); }
 .link-btn:disabled { opacity: 0.65; cursor: wait; }
 
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  padding: clamp(0.75rem, 3vw, 2rem);
+  background: rgba(26, 19, 13, 0.58);
+  backdrop-filter: blur(5px);
+  animation: fade 0.18s ease-out;
+}
+.modal-dialog {
+  position: relative;
+  width: min(100%, 560px);
+  max-height: min(90vh, 900px);
+  overflow-y: auto;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  box-shadow: var(--shadow-pop);
+  animation: rise 0.22s var(--ease);
+}
+.modal-close {
+  position: absolute;
+  z-index: 1;
+  top: 0.65rem;
+  right: 0.75rem;
+  display: grid;
+  width: 2.4rem;
+  height: 2.4rem;
+  place-items: center;
+  border: 1px solid var(--hair-strong);
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--ink);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+.modal-close:hover { background: var(--ink); color: var(--paper); }
+.modal-dialog.auth-dialog { width: min(100%, 480px); }
+.auth-dialog .auth-wrap { display: block; width: 100%; padding: 0; }
+.auth-dialog .auth-card { width: 100%; border: 0; padding: 2.2rem; }
+@media (max-width: 540px) {
+  .modal-backdrop { padding: 0; align-items: end; }
+  .modal-dialog { max-height: 94vh; width: 100%; }
+  .auth-dialog .auth-card { padding: 2.8rem 1.3rem 1.5rem; }
+}
+
 /* ============ header ============ */
 .site-header {
   position: sticky;

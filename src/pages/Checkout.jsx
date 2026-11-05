@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import CostBreakdown from "../components/CostBreakdown";
 import { api, money } from "../lib/api";
 import { useAuth } from "../lib/auth";
@@ -10,6 +10,7 @@ export default function Checkout() {
   const { items, total, setQuantity, remove, clear } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [estimate, setEstimate] = useState(null);
   const [estimateLoading, setEstimateLoading] = useState(false);
   const [form, setForm] = useState({ fulfillment: "delivered_zimbabwe", destination_city: "", notes: "" });
@@ -166,8 +167,8 @@ export default function Checkout() {
                 {!user && (
                   <p className="notice">
                     Sign in so we can quote and track your order.{" "}
-                    <Link to="/login" state={{ next: "/checkout" }}>Sign in</Link> or{" "}
-                    <Link to="/register" state={{ next: "/checkout" }}>create an account</Link>.
+                    <Link to="/login" state={{ next: "/checkout", backgroundLocation: location }}>Sign in</Link> or{" "}
+                    <Link to="/register" state={{ next: "/checkout", backgroundLocation: location }}>create an account</Link>.
                   </p>
                 )}
                 {error && <p className="alert">{error}</p>}

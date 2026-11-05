@@ -19,7 +19,10 @@ export default function Register() {
     setError("");
     try {
       await register(form);
-      navigate(location.state?.next || "/account");
+      navigate(
+        location.state?.next || location.state?.backgroundLocation || "/account",
+        { replace: Boolean(location.state?.backgroundLocation) }
+      );
     } catch (err) {
       setError(err.message);
     } finally {

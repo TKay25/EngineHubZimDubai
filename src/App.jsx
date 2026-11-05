@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
-import { Link, NavLink, Route, Routes, useLocation } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import { Link, NavLink, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import Brand from "./components/Brand";
 import ChatWidget from "./components/ChatWidget";
+import Modal from "./components/Modal";
 import { useAuth } from "./lib/auth";
 import { useCart } from "./lib/cart";
 import { LoadingButton, LoadingState } from "./components/Loading";
@@ -20,6 +21,7 @@ function Header() {
   const { user, logout, loading } = useAuth();
   const { count } = useCart();
   const location = useLocation();
+  const backgroundLocation = location.state?.backgroundLocation || location;
   const [scrolled, setScrolled] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const [signOutError, setSignOutError] = useState("");
@@ -73,8 +75,8 @@ function Header() {
             </>
           ) : (
             <>
-              <Link className="btn quiet small" to="/login">Sign in</Link>
-              <Link className="btn small" to="/register">Create account</Link>
+              <Link className="btn quiet small" to="/login" state={{ backgroundLocation }}>Sign in</Link>
+              <Link className="btn small" to="/register" state={{ backgroundLocation }}>Create account</Link>
             </>
           )}
         </div>
@@ -128,11 +130,16 @@ function Footer() {
 }
 
 export default function App() {
+  const location = useLocation();
+  const backgroundLocation = location.state?.backgroundLocation;
+  const navigate = useNavigate();
+  const closeAuthModal = useCallback(() => navigate(-1), [navigate]);
+
   return (
     <div className="app-shell">
       <Header />
       <main>
-        <Routes>
+        <Routes location={backgroundLocation || location}>
           <Route path="/" element={<Home />} />
           <Route path="/engines" element={<Catalog />} />
           <Route path="/engines/:id" element={<EngineDetail />} />
@@ -146,6 +153,18 @@ export default function App() {
           <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<Home />} />
         </Routes>
+        {backgroundLocation && (
+          <Routes>
+            <Route
+              path="/login"
+              element={<Modal title="Sign in" onClose={closeAuthModal} className="auth-dialog"><Login /></Modal>}
+            />
+            <Route
+              path="/register"
+              element={<Modal title="Create an account" onClose={closeAuthModal} className="auth-dialog"><Register /></Modal>}
+            />
+          </Routes>
+        )}
       </main>
       <Footer />
       <ChatWidget />

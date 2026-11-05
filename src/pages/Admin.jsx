@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { api, dateShort, money } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { LoadingButton, LoadingState } from "../components/Loading";
@@ -37,6 +37,7 @@ function Stat({ label, value, highlight }) {
 
 export default function Admin() {
   const { user, loading, loadSite } = useAuth();
+  const location = useLocation();
   const [tab, setTab] = useState("orders");
   const [stats, setStats] = useState(null);
   const [orders, setOrders] = useState([]);
@@ -83,7 +84,7 @@ export default function Admin() {
   if (!user?.is_admin) {
     return (
       <div className="container page">
-        <p className="alert">Administrator access required. <Link to="/login">Sign in</Link>.</p>
+        <p className="alert">Administrator access required. <Link to="/login" state={{ backgroundLocation: location }}>Sign in</Link>.</p>
       </div>
     );
   }

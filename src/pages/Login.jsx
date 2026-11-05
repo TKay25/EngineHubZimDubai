@@ -17,7 +17,10 @@ export default function Login() {
     setError("");
     try {
       await login(form.email, form.password);
-      navigate(location.state?.next || "/account");
+      navigate(
+        location.state?.next || location.state?.backgroundLocation || "/account",
+        { replace: Boolean(location.state?.backgroundLocation) }
+      );
     } catch (err) {
       setError(err.message);
     } finally {
