@@ -5,10 +5,7 @@ import os
 from config import BASE_DIR
 
 MANIFEST_PATH = os.path.join(BASE_DIR, "static", "assets", ".vite", "manifest.json")
-FALLBACK = {
-    "js": "assets/app.js",
-    "css": "assets/app.css",
-}
+FALLBACK = None
 
 
 def _manifest():
@@ -22,10 +19,15 @@ def asset_urls(entry="src/main.jsx"):
     """Filenames relative to Flask's static folder, for url_for('static', ...)."""
     manifest = _manifest()
     chunk = manifest.get(entry)
-    if not chunk:
+    if not chunk or not chunk.get("file"):
         return FALLBACK
     js = "assets/" + chunk["file"]
-    css = next(("assets/" + f for f in chunk.get("css", [])), FALLBACK["css"])
+    static_dir = os.path.join(BASE_DIR, "static")
+    if not os.path.isfile(os.path.join(static_dir, js)):
+        return FALLBACK
+    css = next(("assets/" + f for f in chunk.get("css", [])), None)
+    if css and not os.path.isfile(os.path.join(static_dir, css)):
+        return FALLBACK
     return {"js": js, "css": css}
 
 

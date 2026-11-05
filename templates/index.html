@@ -15,12 +15,22 @@
     {% if vite_dev %}
     <script type="module" src="http://localhost:5173/@vite/client"></script>
     <script type="module" src="http://localhost:5173/src/main.jsx"></script>
-    {% else %}
+    {% elif assets %}
+    {% if assets.css %}
     <link rel="stylesheet" href="{{ url_for('static', filename=assets.css) }}" />
+    {% endif %}
     <script type="module" src="{{ url_for('static', filename=assets.js) }}"></script>
     {% endif %}
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      {% if not vite_dev and not assets %}
+      <main style="max-width: 42rem; margin: 12vh auto; padding: 2rem; font: 16px/1.6 system-ui, sans-serif; color: #23180f;">
+        <p style="font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;">ZimOsaka AutoSpares</p>
+        <h1>Website build is incomplete</h1>
+        <p>The server is running, but the frontend bundle is missing. In Render, set the Build Command to <code>pip install -r requirements.txt && npm ci && npm run build</code>, then deploy again.</p>
+      </main>
+      {% endif %}
+    </div>
   </body>
 </html>
