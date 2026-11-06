@@ -548,7 +548,8 @@ function posterSvg(poster, index) {
   if (!layout) {
     throw new Error(`Unknown poster layout: ${poster.layout}`);
   }
-  return `${documentStart(poster, index)}\n${layout(poster)}\n</svg>\n`;
+  return `${documentStart(poster, index)}\n${layout(poster)}\n</svg>\n`
+    .replace(/[ \t]+(?=\r?\n)/g, "");
 }
 
 function galleryHtml() {

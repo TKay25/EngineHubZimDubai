@@ -1,4 +1,5 @@
 """Company settings and admin catalog management."""
+import io
 
 
 def test_public_site_settings_expose_brand(client):
