@@ -463,7 +463,13 @@ class CompanySettings(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     company_name = db.Column(db.String(120), nullable=False, default="ZimOsaka AutoSpares")
-    tagline = db.Column(db.String(200), default="Engines sourced from Dubai to order")
+    tagline = db.Column(
+        db.String(200),
+        default=(
+            "Engines sourced from Dubai, delivered across Zimbabwe, with optional fitting "
+            "by our Zimbabwe mechanics"
+        ),
+    )
     phone = db.Column(db.String(40))
     whatsapp = db.Column(db.String(32))
     email = db.Column(db.String(255))

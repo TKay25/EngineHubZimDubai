@@ -31,7 +31,10 @@ def get_settings():
         settings = CompanySettings(
             id=1,
             company_name="ZimOsaka AutoSpares",
-            tagline="Engines sourced from Dubai, delivered across Zimbabwe",
+            tagline=(
+                "Engines sourced from Dubai, delivered across Zimbabwe, with optional fitting "
+                "by our Zimbabwe mechanics"
+            ),
             phone="+263 77 000 0000",
             whatsapp="263770000000",
             email="sales@zimosaka.co.zw",

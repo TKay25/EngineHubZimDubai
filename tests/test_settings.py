@@ -5,6 +5,7 @@ import io
 def test_public_site_settings_expose_brand(client):
     site = client.get("/api/site").get_json()["site"]
     assert site["company_name"] == "ZimOsaka AutoSpares"
+    assert "optional fitting by our Zimbabwe mechanics" in site["tagline"].lower()
     assert site["whatsapp_link"].startswith("https://wa.me/")
     assert site["payment_methods"]
     assert "catalog_size" in site

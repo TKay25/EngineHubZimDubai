@@ -254,8 +254,8 @@ export default function OrderDetail() {
           )}
 
           <div className="trust-item" style={{ marginTop: "1.2rem" }}>
-            <h3>Fitting in Zimbabwe</h3>
-            <p>After the engine arrives, fitting can be arranged through our trusted mechanic as a separate service.</p>
+            <h3>Fitting and mounting in Zimbabwe</h3>
+            <p>When the engine arrives, our mechanics can fit or mount it in your vehicle as an optional service.</p>
           </div>
 
           {user?.is_admin && (

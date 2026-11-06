@@ -87,7 +87,7 @@ export default function EngineFinder({ compact = false }) {
             <option key={m} value={m}>{m}</option>
           ))}
         </select>
-        <LoadingButton className="btn primary" style={{ borderRadius: 0 }} disabled={loading} loading={loading} loadingLabel="Loading…">
+        <LoadingButton className="btn primary" disabled={loading} loading={loading} loadingLabel="Loading…">
           Find my engine
         </LoadingButton>
         {!compact && (

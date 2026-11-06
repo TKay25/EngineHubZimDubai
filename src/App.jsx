@@ -5,6 +5,7 @@ import ChatWidget from "./components/ChatWidget";
 import Modal from "./components/Modal";
 import { useAuth } from "./lib/auth";
 import { useCart } from "./lib/cart";
+import { withLocalMechanicFitting } from "./lib/siteCopy";
 import { LoadingButton, LoadingState } from "./components/Loading";
 import Home from "./pages/Home";
 import Catalog from "./pages/Catalog";
@@ -123,7 +124,10 @@ function Footer() {
               <img src="/static/brand/logo.svg" alt={companyName} />
             </div>
             <p className="footer-note">
-              {site?.tagline || "Engines sourced from Dubai, delivered across Zimbabwe."}
+              {withLocalMechanicFitting(site?.tagline)}
+            </p>
+            <p className="footer-service-note">
+              After arrival in Zimbabwe, our mechanics can fit or mount the engine in your vehicle.
             </p>
             {site?.registration_number && (
               <p className="mono" style={{ fontSize: "0.72rem", letterSpacing: "0.04em", marginTop: "1rem" }}>

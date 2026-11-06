@@ -4,7 +4,7 @@ import { LoadingButton } from "./Loading";
 
 const GREETING = {
   id: "GREETING",
-  text: "Hi — I'm the ZimOsaka assistant. I can show you the engines we source, price one landed in Zimbabwe, or track an order.",
+  text: "Hi — I'm the ZimOsaka assistant. I can show you the engines we source, price one landed in Zimbabwe, or track an order. After arrival, our mechanics in Zimbabwe can also fit or mount it in your vehicle as an optional service.",
   options: [
     { id: "MENU_BROWSE", label: "Browse engines", primary: true },
     { id: "MENU_QUOTE", label: "Price an engine", primary: true },

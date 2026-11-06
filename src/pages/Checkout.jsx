@@ -97,7 +97,9 @@ export default function Checkout() {
           <h1>Request a quote</h1>
           <p className="lede">
             No engines are held in stock. We check Dubai suppliers after your request and search
-            local garages if needed. No payment is taken until you review the proforma.
+            local garages if needed. No payment is taken until you review the proforma. After
+            arrival in Zimbabwe, our mechanics can fit or mount the engine in your vehicle as an
+            optional service.
           </p>
         </div>
       </div>

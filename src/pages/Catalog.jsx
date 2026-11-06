@@ -65,7 +65,9 @@ export default function Catalog() {
           <h1>Engines</h1>
           <p className="lede">
             Engine types we can search for — not stock listings. Request one and we check Dubai
-            suppliers; if it is unavailable, our team searches local garages before quoting.
+            suppliers; if it is unavailable, our team searches local garages before quoting. After
+            arrival in Zimbabwe, our mechanics can fit or mount it in your vehicle as an optional
+            service.
           </p>
         </div>
         <div className="meta" style={{ textAlign: "right" }}>

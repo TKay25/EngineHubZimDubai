@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 84" width="460" height="84" role="img" aria-label="ZimOsaka AutoSpares">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 84" width="250" height="84" role="img" aria-label="ZimOsaka AutoSpares">
   <g transform="translate(4 14)">
     <rect width="56" height="56" rx="15" fill="#15243d"/>
     <path d="M15 17h17l-13 17h15" fill="none" stroke="#ffffff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
@@ -7,5 +7,4 @@
   </g>
   <text x="76" y="41" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="29" font-weight="800" letter-spacing="-0.8" fill="#15243d">Zim<tspan fill="#8b6814">Osaka</tspan></text>
   <text x="76" y="64" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" letter-spacing="3.2" fill="#8b6814">AUTOSPARES</text>
-  <text x="330" y="64" font-family="Inter, 'Segoe UI', system-ui, -apple-system, sans-serif" font-size="11.5" font-weight="500" letter-spacing=".4" fill="#65748a">Dubai ? Zimbabwe</text>
 </svg>

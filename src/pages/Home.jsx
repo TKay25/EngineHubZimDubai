@@ -4,23 +4,76 @@ import EngineFinder from "../components/EngineFinder";
 import { api, money } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { LoadingState } from "../components/Loading";
+import toyota1kdPhoto from "../../marketing/posters/assets/toyota-1kd-ftv.jpg";
+import mitsubishi4d56Photo from "../../marketing/posters/assets/mitsubishi-4d56.jpg";
+import nissanYd25Photo from "../../marketing/posters/assets/nissan-yd25.jpg";
+
+const HERO_SLIDES = [
+  {
+    image: toyota1kdPhoto,
+    imageCredit: "Iamjosemon",
+    imageSource: "https://commons.wikimedia.org/wiki/File:Toyota_1KD-FTV_Engine.jpg",
+    imageLicense: "CC BY 4.0",
+    imageLicenseUrl: "https://creativecommons.org/licenses/by/4.0/",
+    eyebrow: "Engine sourcing, made personal",
+    title: "Your next engine.",
+    accent: "Sourced, not stocked.",
+    description:
+      "Share your engine code, VIN or vehicle details. Our Dubai team checks suppliers and searches local garages if needed.",
+  },
+  {
+    image: mitsubishi4d56Photo,
+    imageCredit: "Mr.choppers",
+    imageSource: "https://commons.wikimedia.org/wiki/File:1991_Mitsubishi_Pajero_2.5TD_Wagon_4D56_engine.jpg",
+    imageLicense: "CC BY-SA 3.0",
+    imageLicenseUrl: "https://creativecommons.org/licenses/by-sa/3.0/",
+    eyebrow: "Dubai search. Clear answers.",
+    title: "The right match.",
+    accent: "Starts with a search.",
+    description:
+      "We confirm the specification and availability, then share a full landed quote so you can review the costs before deciding.",
+  },
+  {
+    image: nissanYd25Photo,
+    imageCredit: "AIMHO'S REBELLION 8490s",
+    imageSource:
+      "https://commons.wikimedia.org/wiki/File:2021_Nissan_Terra_2.5_diesel_Premium_4WD_red_engine_view_in_Brunei.jpg",
+    imageLicense: "CC BY-SA 4.0",
+    imageLicenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
+    eyebrow: "From Dubai to Zimbabwe",
+    title: "One clear journey.",
+    accent: "All the way home.",
+    description:
+      "Approve a suitable engine and pay its deposit to reserve it. After it arrives in Zimbabwe, our mechanics can fit or mount it in your vehicle as an optional service.",
+  },
+];
+
+const ROUTE_STEPS = [
+  ["01", "Tell us what you need", "Engine code, VIN or vehicle details."],
+  ["02", "We search in Dubai", "Suppliers first; garages if needed."],
+  ["03", "You approve and reserve", "A deposit secures the available engine."],
+  ["04", "We ship it home", "Our Zimbabwe mechanics can fit or mount it in your vehicle after arrival (optional service)."],
+];
 
 const STEPS = [
   ["Tell us what you need", "Nothing is held in stock. Send the engine code, VIN or vehicle details."],
   ["We check Dubai availability", "If suppliers do not have a match, our team on the ground searches local garages."],
   ["Review and reserve", "Approve the proforma and pay the deposit; then we reserve the available engine for you."],
-  ["Ship, deliver and fit", "We ship and clear it into Zimbabwe. Fitting is available through our trusted mechanic after arrival."],
+  ["Ship, deliver and fit", "After it arrives in Zimbabwe, our mechanics can fit or mount it in your vehicle as an optional service."],
 ];
 
 const TRUST = [
   ["Inspection before export", "Compression test, oil-pressure check and a video walk-around for every unit."],
   ["Duty shown, not hidden", "Duty, VAT, surtax, clearing and inland delivery are itemised before you pay."],
   ["Proof of sourcing", "Supplier, lot and serial number recorded against your line once purchased."],
-  ["One desk, two countries", "Dubai sourcing and Zimbabwe delivery handled by the same team."],
+  ["One desk, two countries", "Dubai sourcing, Zimbabwe delivery and local engine-fitting support."],
 ];
 
 export default function Home() {
   const { site, companyName } = useAuth();
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [rotationPaused, setRotationPaused] = useState(false);
+  const [interactionPaused, setInteractionPaused] = useState(false);
   const [featured, setFeatured] = useState([]);
   const [featuredLoading, setFeaturedLoading] = useState(true);
   const [featuredError, setFeaturedError] = useState("");
@@ -29,6 +82,27 @@ export default function Home() {
   const [exampleLoading, setExampleLoading] = useState(true);
   const [exampleError, setExampleError] = useState("");
   const [leadRange, setLeadRange] = useState(null);
+
+  useEffect(() => {
+    if (
+      rotationPaused ||
+      interactionPaused ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return undefined;
+    }
+
+    const intervalId = window.setInterval(() => {
+      setActiveSlide((current) => (current + 1) % HERO_SLIDES.length);
+    }, 7000);
+    return () => window.clearInterval(intervalId);
+  }, [interactionPaused, rotationPaused]);
+
+  useEffect(() => {
+    const nextSlide = HERO_SLIDES[(activeSlide + 1) % HERO_SLIDES.length];
+    const nextImage = new Image();
+    nextImage.src = nextSlide.image;
+  }, [activeSlide]);
 
   useEffect(() => {
     let active = true;
@@ -73,82 +147,248 @@ export default function Home() {
     };
   }, []);
 
+  const slide = HERO_SLIDES[activeSlide];
+  const previousSlide = () => {
+    setActiveSlide((current) => (current + HERO_SLIDES.length - 1) % HERO_SLIDES.length);
+  };
+  const nextSlide = () => {
+    setActiveSlide((current) => (current + 1) % HERO_SLIDES.length);
+  };
+
   return (
     <>
-      <section className="hero">
-        <div className="container">
-          <div className="hero-grid">
-            <div>
-              <div className="hero-kicker">
-                <span>Dubai sourcing desk</span>
-                <span>Zimbabwe delivery</span>
-                <span>Pre-order only</span>
-              </div>
-              <h1>
-                <span className="line">The right engine,</span>
-                <span className="line serif">sourced from Dubai,</span>
-                <span className="line">landed at your door.</span>
-              </h1>
-              <p className="hero-copy">
-                {companyName} sources complete engines to order. You choose the engine, we verify
-                it in Dubai and quote the full landed cost — freight, duty, clearance and delivery
-                — before a deposit is paid.
+      <section
+        className="home-hero"
+        aria-label={`${companyName} engine sourcing highlights`}
+        aria-roledescription="carousel"
+        onMouseEnter={() => setInteractionPaused(true)}
+        onMouseLeave={() => setInteractionPaused(false)}
+        onFocusCapture={() => setInteractionPaused(true)}
+        onBlurCapture={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) {
+            setInteractionPaused(false);
+          }
+        }}
+      >
+        <div className="home-hero__background" key={slide.image} aria-hidden="true">
+          <img src={slide.image} alt="" decoding="async" />
+        </div>
+        <div className="home-hero__inner container">
+          <div className="home-hero__layout">
+            <div
+              className="home-hero__copy"
+              key={activeSlide}
+              aria-live={rotationPaused || interactionPaused ? "polite" : "off"}
+            >
+              <p className="home-hero__eyebrow">
+                <span className="home-hero__status-dot" aria-hidden="true" />
+                {slide.eyebrow}
               </p>
-              <div className="hero-actions">
-                <Link className="btn primary large" to="/engines">Browse engine types</Link>
-                <Link className="btn large" to="/calculator">Build a landed-cost quote</Link>
+              <h1>
+                <span>{slide.title}</span>
+                <span className="home-hero__accent">{slide.accent}</span>
+              </h1>
+              <p className="home-hero__description">{slide.description}</p>
+              <div className="home-hero__actions">
+                <Link className="btn accent large" to="/engines">
+                  Browse engine types
+                  <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path d="M3.5 10h12m-5-5 5 5-5 5" />
+                  </svg>
+                </Link>
+                <Link className="btn large home-hero__secondary" to="/checkout">
+                  Request an engine
+                </Link>
               </div>
+              <p className="home-hero__promise">
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <path d="m4 10 4 4 8-8" />
+                </svg>
+                No stock held · availability confirmed per request
+              </p>
             </div>
 
-            <aside className="specimen" aria-live="polite">
+            <aside className="home-route-card" aria-label="How our engine sourcing works">
+              <div className="home-route-card__top">
+                <span className="home-route-card__icon" aria-hidden="true">
+                  <svg viewBox="0 0 32 32" fill="none">
+                    <path d="M5 18h3l3-6h10l4 4h3v8h-3a4 4 0 0 1-8 0h-4a4 4 0 0 1-8 0v-6Z" />
+                    <path d="M11 12V8h9l4 8M12 8V5h6v3" />
+                    <circle cx="11" cy="24" r="2" />
+                    <circle cx="21" cy="24" r="2" />
+                  </svg>
+                </span>
+                <div>
+                  <span className="home-route-card__label">Your sourcing journey</span>
+                  <span className="home-route-card__sub">Dubai to Zimbabwe</span>
+                </div>
+                <span className="home-route-card__badge">
+                  <span aria-hidden="true" />
+                  On request
+                </span>
+              </div>
+              <h2>No stock. A clear path forward.</h2>
+              <ol className="home-route-card__steps">
+                {ROUTE_STEPS.map(([number, title, detail]) => (
+                  <li key={number}>
+                    <span className="home-route-card__number">{number}</span>
+                    <span className="home-route-card__step-copy">
+                      <strong>{title}</strong>
+                      <small>{detail}</small>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+              <p className="home-route-card__note">
+                Illustrative photo only · each engine is sourced for your request.
+              </p>
+            </aside>
+          </div>
+
+          <div className="home-hero__footer">
+            <p className="home-hero__credit">
+              <span>Illustrative photo · </span>
+              <a href={slide.imageSource} target="_blank" rel="noreferrer">
+                {slide.imageCredit} / Wikimedia Commons
+              </a>
+              <span> · </span>
+              <a href={slide.imageLicenseUrl} target="_blank" rel="noreferrer">
+                {slide.imageLicense}
+              </a>
+            </p>
+            <div className="home-hero__controls" role="group" aria-label="Hero slide controls">
+              <span className="home-hero__count" aria-live="off">
+                {String(activeSlide + 1).padStart(2, "0")}
+                <span> / </span>
+                {String(HERO_SLIDES.length).padStart(2, "0")}
+              </span>
+              <div className="home-hero__dots" role="group" aria-label="Choose a slide">
+                {HERO_SLIDES.map((item, index) => (
+                  <button
+                    className={index === activeSlide ? "active" : ""}
+                    key={item.eyebrow}
+                    type="button"
+                    aria-label={`Show slide ${index + 1}: ${item.title} ${item.accent}`}
+                    aria-current={index === activeSlide ? "true" : undefined}
+                    onClick={() => setActiveSlide(index)}
+                  />
+                ))}
+              </div>
+              <button
+                className="home-hero__control"
+                type="button"
+                aria-label="Show previous slide"
+                onClick={previousSlide}
+              >
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <path d="M16.5 10h-12m5 5-5-5 5-5" />
+                </svg>
+              </button>
+              <button
+                className="home-hero__control"
+                type="button"
+                aria-label="Show next slide"
+                onClick={nextSlide}
+              >
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <path d="M3.5 10h12m-5-5 5 5-5 5" />
+                </svg>
+              </button>
+              <button
+                className="home-hero__control home-hero__toggle"
+                type="button"
+                aria-label={rotationPaused ? "Resume automatic slide rotation" : "Pause automatic slide rotation"}
+                aria-pressed={rotationPaused}
+                onClick={() => setRotationPaused((paused) => !paused)}
+              >
+                {rotationPaused ? (
+                  <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path d="m7 4 9 6-9 6V4Z" />
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path d="M7 5v10m6-10v10" />
+                  </svg>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="home-tools-band" id="home-tools">
+        <div className="container">
+          <div className="home-tools-grid">
+            <div className="home-finder-panel">
+              <div className="home-finder-panel__heading">
+                <p className="eyebrow">Start with what you know</p>
+                <h2>Tell us what you&apos;re driving.</h2>
+                <p>Search by vehicle, make or engine code. Not sure? Send us what you have.</p>
+              </div>
+              <EngineFinder />
+            </div>
+
+            <aside className="home-estimate-card" aria-live="polite">
+              <div className="home-estimate-card__heading">
+                <p className="home-estimate-card__eyebrow">Before you commit</p>
+                <h2>Know the full landed cost.</h2>
+              </div>
               {exampleLoading ? (
-                <LoadingState compact label="Building a live landed-cost example…" />
+                <LoadingState compact label="Building a landed-cost example…" />
               ) : example ? (
                 <>
-                  <div className="specimen-head">
-                    <h3>{example.title}</h3>
-                    <span className="code">
-                      {example.displacement_cc ? `${example.displacement_cc.toLocaleString()} cc` : example.model_code} · {example.fuel}
-                    </span>
+                  <div className="home-estimate-card__engine">
+                    <span>Illustrative estimate for</span>
+                    <strong>{example.title}</strong>
+                    <small>
+                      {example.displacement_cc
+                        ? `${example.displacement_cc.toLocaleString()} cc`
+                        : example.model_code}{" "}
+                      · {example.fuel}
+                    </small>
                   </div>
                   {exampleEstimate ? (
                     <>
-                      <ul className="specimen-rows">
-                        <li><span>Supplier price guide</span><strong>{money(exampleEstimate.goods_total)}</strong></li>
+                      <ul className="home-estimate-card__rows">
+                        <li><span>Engine guide</span><strong>{money(exampleEstimate.goods_total)}</strong></li>
                         <li><span>Freight + insurance</span><strong>{money(exampleEstimate.freight + exampleEstimate.insurance)}</strong></li>
                         <li><span>Duty, VAT + surtax</span><strong>{money(exampleEstimate.duty + exampleEstimate.vat + exampleEstimate.surtax)}</strong></li>
                         <li><span>Clearing + inland</span><strong>{money(exampleEstimate.clearing + exampleEstimate.inland)}</strong></li>
-                        <li className="total"><span>Indicative landed total</span><strong>{money(exampleEstimate.total)}</strong></li>
+                        <li className="total"><span>Indicative total</span><strong>{money(exampleEstimate.total)}</strong></li>
                       </ul>
-                      <div className="specimen-foot">
-                        <span>Indicative only · proforma confirms the final price</span>
-                        <Link className="textlink" to="/calculator">Adjust</Link>
+                      <div className="home-estimate-card__footer">
+                        <span>USD · final price confirmed in your proforma</span>
+                        <Link to="/calculator" aria-label="Adjust the landed-cost estimate">
+                          Adjust
+                          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                            <path d="M3.5 10h12m-5-5 5 5-5 5" />
+                          </svg>
+                        </Link>
                       </div>
                     </>
                   ) : (
-                    <p className="alert">{exampleError || "The landed-cost example is temporarily unavailable."}</p>
+                    <p className="home-estimate-card__error" role="status">
+                      {exampleError || "The landed-cost example is temporarily unavailable."}
+                    </p>
                   )}
                 </>
               ) : (
-                <div className="specimen-empty">
-                  <p className="eyebrow">Catalogue awaiting updates</p>
-                  <h3>Need a particular engine?</h3>
-                  <p className="muted">Send us the engine code or vehicle and our sourcing desk can check availability.</p>
-                  <Link className="btn primary" to="/checkout">Request a quote</Link>
+                <div className="home-estimate-card__empty">
+                  <p>Share the engine code or vehicle and we&apos;ll check availability.</p>
+                  <Link className="btn accent" to="/checkout">Request a quote</Link>
                 </div>
               )}
             </aside>
           </div>
 
-          <div style={{ paddingBottom: "2.5rem" }}>
-            <EngineFinder />
-          </div>
-
-          <div className="metrics">
-            <div><strong>Pre-order</strong><span>Sourcing model</span></div>
-            <div><strong>{leadRange ? `${leadRange[0]}–${leadRange[1]}d` : "—"}</strong><span>Catalogue lead-time range</span></div>
-            <div><strong>USD</strong><span>Quote currency</span></div>
-            <div><strong>Before payment</strong><span>Full landed quote</span></div>
+          <div className="metrics home-metrics">
+            <div><strong>On request</strong><span>No engines held in stock</span></div>
+            <div>
+              <strong>{leadRange ? `${leadRange[0]}–${leadRange[1]}d` : "Confirmed"}</strong>
+              <span>Estimated lead time</span>
+            </div>
+            <div><strong>USD</strong><span>Clear quote currency</span></div>
+            <div><strong>Before deposit</strong><span>Full landed cost shown</span></div>
           </div>
         </div>
       </section>

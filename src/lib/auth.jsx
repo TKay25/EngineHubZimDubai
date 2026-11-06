@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { api } from "./api";
+import { withLocalMechanicFitting } from "./siteCopy";
 
 const AuthContext = createContext(null);
 
@@ -35,7 +36,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (!site?.company_name) return;
-    document.title = `${site.company_name} — ${site.tagline || "Engines sourced from Dubai"}`;
+    document.title = `${site.company_name} — ${withLocalMechanicFitting(site.tagline)}`;
   }, [site]);
 
   const value = useMemo(

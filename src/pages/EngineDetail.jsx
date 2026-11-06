@@ -146,8 +146,8 @@ export default function EngineDetail() {
             <p>
               We check suppliers in Dubai. If there is no available match, our local team searches
               garages. Once you approve the proforma and pay the deposit, we reserve the available
-              engine and arrange shipment. Fitting with our trusted mechanic can be arranged after
-              arrival in Zimbabwe as a separate service.
+              engine and arrange shipment. After it arrives in Zimbabwe, our mechanics can fit or
+              mount it in your vehicle as an optional service.
             </p>
           </div>
         </aside>
