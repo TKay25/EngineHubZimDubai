@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56" width="32" height="32" role="img" aria-label="ZimOsaka AutoSpares">
-  <rect width="56" height="56" rx="15" fill="#23180f"/>
-  <path d="M15 17h17l-13 17h15" fill="none" stroke="#fdfaf4" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="38.5" cy="36.5" r="7.6" fill="none" stroke="#b23a12" stroke-width="3.2"/>
-  <path d="M33 9l2.2 4.4 4.4-2.2-2.2 4.4 4.4 2.2" fill="none" stroke="#e8a37e" stroke-width="2.4" stroke-linecap="round"/>
+  <rect width="56" height="56" rx="15" fill="#15243d"/>
+  <path d="M15 17h17l-13 17h15" fill="none" stroke="#ffffff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="38.5" cy="36.5" r="7.6" fill="none" stroke="#8b6814" stroke-width="3.2"/>
+  <path d="M33 9l2.2 4.4 4.4-2.2-2.2 4.4 4.4 2.2" fill="none" stroke="#d4af57" stroke-width="2.4" stroke-linecap="round"/>
 </svg>

@@ -14,6 +14,7 @@ def test_homepage_serves_react_shell_and_valid_description(client):
         'VAT, clearing and delivery across Zimbabwe." />'
     ) in html
     assert 'type="module"' in html
+    assert '<link rel="stylesheet"' in html
 
 
 def test_homepage_explains_when_frontend_bundle_is_missing(client):
@@ -22,6 +23,8 @@ def test_homepage_explains_when_frontend_bundle_is_missing(client):
 
     assert response.status_code == 200
     html = response.get_data(as_text=True)
-    assert "<h1>Website build is incomplete</h1>" in html
+    assert ">Website build is incomplete</h1>" in html
+    assert "color: #15243d" in html
+    assert "border-top: 4px solid #8b6814" in html
     assert "pip install -r requirements.txt && npm ci && npm run build" in html
     assert 'src="/static/assets/app.js"' not in html

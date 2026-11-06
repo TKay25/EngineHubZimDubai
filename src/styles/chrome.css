@@ -90,7 +90,7 @@
   place-items: center;
   overflow-y: auto;
   padding: clamp(0.75rem, 3vw, 2rem);
-  background: rgba(26, 19, 13, 0.58);
+  background: rgba(15, 23, 42, 0.58);
   backdrop-filter: blur(5px);
   animation: fade 0.18s ease-out;
 }
@@ -140,7 +140,7 @@
   position: sticky;
   top: 0;
   z-index: 40;
-  background: rgba(244, 241, 234, 0.92);
+  background: rgba(247, 249, 252, 0.92);
   backdrop-filter: blur(12px) saturate(140%);
   border-bottom: var(--rule);
 }
@@ -413,7 +413,7 @@ input[type="file"] { padding: 0.55rem; background: var(--paper-2); }
   inset: 0;
   z-index: 2;
   min-height: 0;
-  background: rgba(246, 241, 231, 0.82);
+  background: rgba(247, 249, 252, 0.82);
 }
 
 /* ============ alerts ============ */

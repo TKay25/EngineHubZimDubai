@@ -25,10 +25,10 @@
   <body>
     <div id="root">
       {% if not vite_dev and not assets %}
-      <main style="max-width: 42rem; margin: 12vh auto; padding: 2rem; font: 16px/1.6 system-ui, sans-serif; color: #23180f;">
-        <p style="font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;">ZimOsaka AutoSpares</p>
-        <h1>Website build is incomplete</h1>
-        <p>The server is running, but the frontend bundle is missing. In Render, set the Build Command to <code>pip install -r requirements.txt && npm ci && npm run build</code>, then deploy again.</p>
+      <main style="max-width: 42rem; margin: 12vh auto; padding: 2.5rem; border: 1px solid #d8e0eb; border-top: 4px solid #8b6814; background: #fff; box-shadow: 0 18px 40px -32px rgba(21, 36, 61, .25); font: 16px/1.6 system-ui, sans-serif; color: #15243d;">
+        <p style="font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #8b6814;">ZimOsaka AutoSpares</p>
+        <h1 style="color: #15243d;">Website build is incomplete</h1>
+        <p>The server is running, but the frontend bundle is missing. In Render, set the Build Command to <code style="padding: .15rem .35rem; background: #eef2f7; color: #15243d;">pip install -r requirements.txt && npm ci && npm run build</code>, then deploy again.</p>
       </main>
       {% endif %}
     </div>

@@ -290,7 +290,7 @@
   position: relative;
   border: 1px solid var(--ink);
   background:
-    repeating-linear-gradient(135deg, transparent 0 6px, rgba(20, 19, 15, 0.025) 6px 7px),
+    repeating-linear-gradient(135deg, transparent 0 6px, rgba(21, 36, 61, 0.025) 6px 7px),
     var(--card);
   padding: 1.4rem;
   margin-bottom: 1.6rem;
@@ -550,7 +550,7 @@
   color: var(--paper);
 }
 .closing h2 { color: var(--paper); margin-bottom: 0.6rem; }
-.closing p { color: #b9b4a8; margin: 0; max-width: 52ch; font-size: 0.95rem; }
+.closing p { color: #cbd5e1; margin: 0; max-width: 52ch; font-size: 0.95rem; }
 .closing .btn { border-color: var(--paper); color: var(--paper); }
 .closing .btn:hover { background: var(--paper); color: var(--ink); }
 
@@ -587,7 +587,7 @@
 }
 .stat strong { font-family: var(--font-display); font-size: 1.75rem; letter-spacing: -0.04em; }
 .stat.highlight { background: var(--ink); }
-.stat.highlight span { color: #8f8a7e; }
+.stat.highlight span { color: #cbd5e1; }
 .stat.highlight strong { color: var(--paper); }
 
 .tabs { display: flex; gap: 0; margin-bottom: 2rem; border-bottom: 1px solid var(--ink); flex-wrap: wrap; }

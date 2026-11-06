@@ -111,14 +111,14 @@ Generated SVGs live in `static/brand/` (`logo.svg`, `mark.svg`, `monogram.svg`, 
 are produced by `python brand_assets.py`. The primary mark is the **ZO monogram** (Z + accelerator
 ring + spark).
 
-Design system: **editorial light ? sand & rust**
+Design system: **navy, white and gold**
 
 | Token | Value | Use |
 |---|---|---|
-| `--paper` | `#f6f1e7` | page ground |
-| `--ink` | `#23180f` | text, rules, primary buttons |
-| `--accent` | `#b23a12` | the single accent ? CTAs, active states, serif emphasis |
-| `--hair` / `--hair-strong` | `#ddd0bb` / `#c8b79c` | hairlines and card borders |
+| `--paper` | `#f7f9fc` | page ground |
+| `--ink` | `#15243d` | text, rules, primary buttons |
+| `--accent` | `#8b6814` | accessible gold accent for CTAs, active states and emphasis |
+| `--hair` / `--hair-strong` | `#d8e0eb` / `#b7c3d3` | hairlines and card borders |
 
 Typography: **Archivo** (display, uppercase micro-labels), **Inter Tight** (body),
 **Instrument Serif** italic (editorial emphasis). Numbers are tabular via `.mono`.

@@ -1,27 +1,26 @@
 /* ============================================================
    ZimOsaka AutoSpares — Editorial Light system
-   Warm paper, near-black ink, one ink-blue accent, hairlines.
+   Cool white surfaces, deep navy and antique-gold accents.
    ============================================================ */
 
 @import url("https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600;700&display=swap");
 
 :root {
-  /* paper & ink ? sand & rust */
-  --paper: #f6f1e7;
-  --paper-2: #f0e8db;
-  --paper-3: #e5d9c6;
-  --card: #fdfaf4;
-  --ink: #23180f;
-  --ink-2: #4d3d2e;
-  --ink-3: #7a6753;
-  --ink-4: #a3947f;
-  --hair: #ddd0bb;
-  --hair-strong: #c8b79c;
+  /* Cool white surfaces, deep navy text and accessible antique-gold accents. */
+  --paper: #f7f9fc;
+  --paper-2: #eef2f7;
+  --paper-3: #e2e8f0;
+  --card: #ffffff;
+  --ink: #15243d;
+  --ink-2: #33445c;
+  --ink-3: #65748a;
+  --ink-4: #66758a;
+  --hair: #d8e0eb;
+  --hair-strong: #b7c3d3;
 
-  /* single accent ? terracotta */
-  --accent: #b23a12;
-  --accent-dark: #8d2d0e;
-  --accent-wash: #f6e3d9;
+  --accent: #8b6814;
+  --accent-dark: #6f520c;
+  --accent-wash: #f5efd9;
 
   /* signal colours (data only, never decoration) */
   --ok: #2f5d3a;
@@ -42,8 +41,8 @@
   --radius-sm: 2px;
   --radius: 4px;
   --radius-pill: 999px;
-  --shadow-card: 0 1px 0 var(--hair), 0 18px 40px -32px rgba(20, 19, 15, 0.55);
-  --shadow-pop: 0 24px 60px -28px rgba(20, 19, 15, 0.5);
+  --shadow-card: 0 1px 0 var(--hair), 0 18px 40px -32px rgba(21, 36, 61, 0.25);
+  --shadow-pop: 0 24px 60px -28px rgba(21, 36, 61, 0.35);
 
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --header-h: 76px;
@@ -74,7 +73,7 @@ body::before {
   z-index: 0;
   pointer-events: none;
   opacity: 0.35;
-  background-image: radial-gradient(rgba(20, 19, 15, 0.14) 0.5px, transparent 0.5px);
+  background-image: radial-gradient(rgba(21, 36, 61, 0.06) 0.5px, transparent 0.5px);
   background-size: 3px 3px;
   mix-blend-mode: multiply;
 }
