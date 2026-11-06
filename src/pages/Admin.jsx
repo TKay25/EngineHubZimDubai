@@ -19,6 +19,13 @@ const STATUS_FLOW = [
   "shipped", "customs_clearing", "delivered", "cancelled",
 ];
 
+const SOURCING_STATE_OPTIONS = [
+  ["requested", "Check Dubai availability"],
+  ["available", "Available — ready to quote"],
+  ["garage_search", "Search Dubai garages"],
+  ["reserved", "Reserved for customer"],
+];
+
 const EMPTY_ENGINE = {
   make: "", model_code: "", title: "", displacement_cc: "", fuel: "diesel",
   cylinders: "", transmission: "manual", condition: "used_jdm", condition_grade: "",
@@ -277,6 +284,7 @@ export default function Admin() {
 function CatalogAdmin({ engines, onDone, onError }) {
   const [draft, setDraft] = useState(EMPTY_ENGINE);
   const [editing, setEditing] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
   const [busy, setBusy] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -289,6 +297,7 @@ function CatalogAdmin({ engines, onDone, onError }) {
 
   function edit(engine) {
     setEditing(engine.id);
+    setImageFile(null);
     setDraft({ ...EMPTY_ENGINE, ...engine, includes: (engine.includes || []).join(", "), fits_vehicles: (engine.fits || []).join(", ") });
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -296,17 +305,29 @@ function CatalogAdmin({ engines, onDone, onError }) {
   function reset() {
     setEditing(null);
     setDraft(EMPTY_ENGINE);
+    setImageFile(null);
   }
 
   async function save(e) {
     e.preventDefault();
     setBusy(true);
     try {
+      let payload = draft;
+      if (imageFile) {
+        payload = new FormData();
+        Object.entries(draft).forEach(([key, value]) => {
+          payload.append(key, value == null ? "" : String(value));
+        });
+        payload.append("image", imageFile);
+      }
+      const options = imageFile
+        ? { method: editing ? "PATCH" : "POST", form: payload }
+        : { method: editing ? "PATCH" : "POST", body: payload };
       if (editing) {
-        await api(`/admin/engines/${editing}`, { method: "PATCH", body: draft });
+        await api(`/admin/engines/${editing}`, options);
         onDone("Engine type updated.");
       } else {
-        await api("/admin/engines", { method: "POST", body: draft });
+        await api("/admin/engines", options);
         onDone("Engine type added to the catalogue.");
       }
       reset();
@@ -340,6 +361,12 @@ function CatalogAdmin({ engines, onDone, onError }) {
         </div>
         <span className="meta">{engines.length} in catalogue</span>
       </div>
+      <p className="notice">
+        No engines are held in stock. Catalogue entries describe engine types we can source, not
+        units currently for sale. We check availability after a request; if suppliers do not have a
+        match, our Dubai team searches local garages. A confirmed unit is reserved after the
+        customer approves the quote and pays the deposit.
+      </p>
       <form onSubmit={save} className="stack-form">
         <div className="editor-grid">
           <label>Make<input required value={draft.make} onChange={set("make")} placeholder="Toyota" /></label>
@@ -357,13 +384,29 @@ function CatalogAdmin({ engines, onDone, onError }) {
           <label>Fits vehicles (comma separated)<input value={draft.fits_vehicles} onChange={set("fits_vehicles")} placeholder="Hilux, Fortuner, Hiace" /></label>
           <label>Includes (comma separated)<input value={draft.includes} onChange={set("includes")} placeholder="Turbo, injectors, ECU" /></label>
           <label>Image URL (optional)<input value={draft.image_url} onChange={set("image_url")} placeholder="https://…" /></label>
+          <label>
+            Upload engine photo (JPEG, PNG or WebP; up to 5 MB)
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+              onChange={(e) => setImageFile(e.target.files[0] || null)}
+            />
+          </label>
           <label>Description<input value={draft.description} onChange={set("description")} /></label>
           <label>Warranty note<input value={draft.warranty_note} onChange={set("warranty_note")} placeholder="90-day start-up warranty" /></label>
         </div>
+        {imageFile && <p className="fineprint">Selected photo: {imageFile.name}. It will replace the image URL when saved.</p>}
+        {!imageFile && draft.image_url && (
+          <img
+            src={draft.image_url}
+            alt={`${draft.title || "Engine"} catalogue photo`}
+            style={{ display: "block", maxWidth: "280px", maxHeight: "180px", objectFit: "cover", border: "1px solid var(--hair)" }}
+          />
+        )}
         <div style={{ display: "flex", gap: "1.5rem", flexWrap: "wrap", alignItems: "center" }}>
           <label style={{ display: "inline-flex", gap: "0.5rem", alignItems: "center" }}>
             <input type="checkbox" checked={draft.sourcing_available} onChange={set("sourcing_available")} />
-            Available to source
+            Accept requests for this engine type
           </label>
           <label style={{ display: "inline-flex", gap: "0.5rem", alignItems: "center" }}>
             <input type="checkbox" checked={draft.featured} onChange={set("featured")} />
@@ -380,16 +423,17 @@ function CatalogAdmin({ engines, onDone, onError }) {
 
       <div className="table-wrap" style={{ marginTop: "2.5rem" }}>
         <table>
-          <thead><tr><th>Make</th><th>Model</th><th>Title</th><th>Guide</th><th>Lead</th><th>Status</th><th /></tr></thead>
+          <thead><tr><th>Photo</th><th>Make</th><th>Model</th><th>Title</th><th>Guide</th><th>Lead</th><th>Status</th><th /></tr></thead>
           <tbody>
             {engines.map((e) => (
               <tr key={e.id}>
+                <td>{e.image_url ? <img src={e.image_url} alt={`${e.title} catalogue photo`} style={{ width: "72px", height: "52px", objectFit: "cover", borderRadius: "4px" }} /> : "—"}</td>
                 <td>{e.make}</td>
                 <td className="mono small">{e.model_code}</td>
                 <td className="small">{e.title}</td>
                 <td className="mono">{money(e.guide_price_usd)}</td>
                 <td className="mono small">{e.typical_lead_days}d</td>
-                <td>{e.sourcing_available ? <span className="pill ok">Live</span> : <span className="pill muted">Paused</span>}</td>
+                <td>{e.sourcing_available ? <span className="pill ok">Taking requests</span> : <span className="pill muted">Paused</span>}</td>
                 <td className="nowrap">
                   <button type="button" className="link-btn" onClick={() => edit(e)}>Edit</button>
                   <button type="button" className="link-btn" style={{ marginLeft: "0.8rem" }} onClick={() => setDeleteTarget(e)}>
@@ -506,6 +550,7 @@ function OrderPanel({ order, onDone, onError }) {
     items: order.items.map((i) => ({
       id: i.id,
       unit_price_usd: i.unit_price_usd,
+      sourcing_state: i.sourcing_state || "requested",
       supplier: i.supplier || "",
       supplier_ref: i.supplier_ref || "",
       lot_number: i.lot_number || "",
@@ -514,11 +559,56 @@ function OrderPanel({ order, onDone, onError }) {
   });
   const [status, setStatus] = useState(order.status);
   const [note, setNote] = useState("");
+  const [availabilityNote, setAvailabilityNote] = useState("");
   const [busyAction, setBusyAction] = useState("");
+
+  useEffect(() => {
+    setForm({
+      freight: order.breakdown.freight,
+      insurance: order.breakdown.insurance,
+      clearing: order.breakdown.clearing,
+      inland: order.breakdown.inland,
+      duty_rate: order.breakdown.duty_rate,
+      vat_rate: order.breakdown.vat_rate,
+      surtax_rate: order.breakdown.surtax_rate,
+      deposit_pct: order.deposit_pct,
+      note: "",
+      items: order.items.map((i) => ({
+        id: i.id,
+        unit_price_usd: i.unit_price_usd,
+        sourcing_state: i.sourcing_state || "requested",
+        supplier: i.supplier || "",
+        supplier_ref: i.supplier_ref || "",
+        lot_number: i.lot_number || "",
+        serial_number: i.serial_number || "",
+      })),
+    });
+    setStatus(order.status);
+    setNote("");
+    setAvailabilityNote("");
+  }, [order]);
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
   const setItem = (id, key, value) =>
     setForm((f) => ({ ...f, items: f.items.map((i) => (i.id === id ? { ...i, [key]: value } : i)) }));
+
+  async function saveAvailability() {
+    setBusyAction("availability");
+    try {
+      const res = await api(`/admin/orders/${order.reference}/availability`, {
+        method: "PATCH",
+        body: {
+          items: form.items.map(({ id, sourcing_state }) => ({ id, sourcing_state })),
+          note: availabilityNote,
+        },
+      });
+      onDone(`Dubai availability updated for ${order.reference}.`, res.order);
+    } catch (err) {
+      onError(err.message);
+    } finally {
+      setBusyAction("");
+    }
+  }
 
   async function saveQuote(e) {
     e.preventDefault();
@@ -568,6 +658,19 @@ function OrderPanel({ order, onDone, onError }) {
               <div key={item.id} style={{ borderTop: "1px solid var(--hair)", paddingTop: "0.8rem" }}>
                 <strong className="small">{data.title}</strong>
                 <div className="editor-grid" style={{ marginTop: "0.5rem" }}>
+                  <label>
+                    Dubai availability
+                    <select
+                      value={item.sourcing_state}
+                      onChange={(e) => setItem(item.id, "sourcing_state", e.target.value)}
+                    >
+                      {SOURCING_STATE_OPTIONS.map(([value, label]) => (
+                        <option key={value} value={value} disabled={value === "reserved"}>
+                          {label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                   <label>Unit price (USD)<input type="number" min="0.01" step="0.01" value={item.unit_price_usd} onChange={(e) => setItem(item.id, "unit_price_usd", e.target.value)} /></label>
                   <label>Supplier<input value={item.supplier} onChange={(e) => setItem(item.id, "supplier", e.target.value)} /></label>
                   <label>Supplier ref<input value={item.supplier_ref} onChange={(e) => setItem(item.id, "supplier_ref", e.target.value)} /></label>
@@ -577,6 +680,17 @@ function OrderPanel({ order, onDone, onError }) {
               </div>
             );
           })}
+          <label>Availability update for customer (optional)<input value={availabilityNote} onChange={(e) => setAvailabilityNote(e.target.value)} placeholder="e.g. Our Dubai team is checking local garages" /></label>
+          <LoadingButton
+            type="button"
+            className="btn small"
+            loading={busyAction === "availability"}
+            disabled={Boolean(busyAction)}
+            loadingLabel="Saving availability…"
+            onClick={saveAvailability}
+          >
+            Save availability
+          </LoadingButton>
           <div className="two-col">
             <label>Freight<input type="number" step="0.01" value={form.freight} onChange={set("freight")} /></label>
             <label>Insurance<input type="number" step="0.01" value={form.insurance} onChange={set("insurance")} /></label>
@@ -588,7 +702,17 @@ function OrderPanel({ order, onDone, onError }) {
             <label>Deposit %<input type="number" step="0.01" value={form.deposit_pct} onChange={set("deposit_pct")} /></label>
           </div>
           <label>Note to customer<input value={form.note} onChange={set("note")} placeholder="e.g. unit located and compression tested" /></label>
-          <LoadingButton className="btn primary" loading={busyAction === "quote"} disabled={Boolean(busyAction)} loadingLabel="Issuing quote…">
+          {form.items.some((item) => item.sourcing_state === "garage_search") && (
+            <p className="notice">
+              Issue the proforma after the Dubai team finds and verifies a suitable engine.
+            </p>
+          )}
+          <LoadingButton
+            className="btn primary"
+            loading={busyAction === "quote"}
+            disabled={Boolean(busyAction) || form.items.some((item) => item.sourcing_state === "garage_search")}
+            loadingLabel="Issuing quote…"
+          >
             Issue quote
           </LoadingButton>
         </form>

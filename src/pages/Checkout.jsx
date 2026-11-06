@@ -96,8 +96,8 @@ export default function Checkout() {
           <p className="eyebrow">Sourcing request</p>
           <h1>Request a quote</h1>
           <p className="lede">
-            No payment is taken now. We confirm availability and send a proforma with the full
-            landed cost.
+            No engines are held in stock. We check Dubai suppliers after your request and search
+            local garages if needed. No payment is taken until you review the proforma.
           </p>
         </div>
       </div>
@@ -212,7 +212,7 @@ export default function Checkout() {
           <p className="eyebrow">Sourcing request received</p>
           <h2>We’ll confirm availability</h2>
           <p>Your reference is <strong className="mono">{createdOrder.reference}</strong>.</p>
-          <p className="muted">No payment has been taken. We’ll send your proforma once the Dubai desk confirms the engine.</p>
+          <p className="muted">No payment has been taken. We’ll send your proforma once the Dubai desk confirms a suitable engine or finds one through a garage search.</p>
           <div className="dialog-actions">
             <Link className="btn primary" to={`/orders/${createdOrder.reference}`}>View request</Link>
             <button className="btn" type="button" onClick={() => setCreatedOrder(null)}>Continue browsing</button>
@@ -225,7 +225,7 @@ export default function Checkout() {
         <div className="dialog-content">
           <p className="eyebrow">Custom sourcing request</p>
           <h2>Thanks — we have your details</h2>
-          <p className="muted">Our sourcing desk will review your engine requirements and contact you.</p>
+          <p className="muted">Our Dubai sourcing desk will check suppliers and search local garages if needed, then contact you with a suitable option and quote.</p>
           <button className="btn primary" type="button" onClick={() => setCustomSent(false)}>Done</button>
         </div>
       </Modal>

@@ -57,8 +57,12 @@ def _save_engine_image(upload):
     filename = f"{uuid.uuid4().hex}{extension}"
     directory = current_app.config["ENGINE_IMAGE_DIR"]
     path = os.path.join(directory, filename)
-    os.makedirs(directory, exist_ok=True)
-    upload.save(path)
+    try:
+        os.makedirs(directory, exist_ok=True)
+        upload.save(path)
+    except OSError:
+        _remove_file(path)
+        raise
     return ENGINE_IMAGE_URL_PREFIX + filename, path
 
 

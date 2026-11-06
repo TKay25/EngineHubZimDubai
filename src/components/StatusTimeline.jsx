@@ -1,7 +1,7 @@
 const STEPS = [
-  ["quote_requested", "Request received", "We have your engine list and are checking availability."],
+  ["quote_requested", "Request received", "We check Dubai suppliers and search local garages if a match is not available."],
   ["quoted", "Proforma issued", "Supplier price and full landed cost confirmed."],
-  ["deposit_paid", "Deposit received", "Your sourcing slot is secured."],
+  ["deposit_paid", "Deposit received", "Your sourcing slot is secured; per-engine availability is shown above."],
   ["sourcing", "Sourcing in Dubai", "The unit is located, inspected and compression tested."],
   ["purchased", "Purchased", "Bought from the supplier and recorded against your order."],
   ["shipped", "In transit", "Loaded for export with a container reference."],

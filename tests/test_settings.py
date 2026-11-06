@@ -89,6 +89,52 @@ def test_admin_catalog_crud(app, admin_client, client):
     assert client.get(f"/api/engines/{engine_id}").status_code == 404
 
 
+def test_admin_can_upload_engine_photo(app, admin_client, client, tmp_path, monkeypatch):
+    photo_dir = tmp_path / "engine-photos"
+    monkeypatch.setitem(app.config, "ENGINE_IMAGE_DIR", str(photo_dir))
+    png = (
+        b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01"
+        b"\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\x0bIDAT\x08\xd7"
+        b"c\xf8\x0f\x00\x01\x01\x01\x00\x1c\xdd\x8d\xb4\x00\x00\x00\x00"
+        b"IEND\xaeB`\x82"
+    )
+
+    created = admin_client.post(
+        "/api/admin/engines",
+        data={
+            "make": "Volvo",
+            "model_code": "D8K",
+            "title": "Volvo D8K Diesel",
+            "guide_price_usd": "7700",
+            "image": (io.BytesIO(png), "engine.png"),
+        },
+        content_type="multipart/form-data",
+    )
+    assert created.status_code == 201, created.get_json()
+    image_url = created.get_json()["engine"]["image_url"]
+    assert image_url.startswith("/uploads/engines/")
+    served = client.get(image_url)
+    assert served.status_code == 200
+    assert served.data == png
+    assert list(photo_dir.iterdir())
+
+
+def test_engine_photo_upload_rejects_non_image_files(admin_client):
+    response = admin_client.post(
+        "/api/admin/engines",
+        data={
+            "make": "Volvo",
+            "model_code": "D9A",
+            "title": "Volvo D9A Diesel",
+            "guide_price_usd": "7800",
+            "image": (io.BytesIO(b"<svg></svg>"), "engine.svg"),
+        },
+        content_type="multipart/form-data",
+    )
+    assert response.status_code == 400
+    assert "JPEG, PNG or WebP" in response.get_json()["error"]
+
+
 def test_catalog_endpoints_are_admin_only(client):
     assert client.get("/api/admin/engines").status_code == 401
     assert client.post("/api/admin/engines", json={}).status_code == 401

@@ -78,11 +78,30 @@ def test_order_flow_to_delivery(app, client, admin_client, customer, engine):
     listed = client.get("/api/orders").get_json()["orders"]
     assert [o["reference"] for o in listed] == [ref]
 
+    item_id = order["items"][0]["id"]
+    searching = admin_client.patch(
+        f"/api/admin/orders/{ref}/availability",
+        json={"items": [{"id": item_id, "sourcing_state": "garage_search"}]},
+    )
+    assert searching.status_code == 200
+    assert searching.get_json()["order"]["items"][0]["sourcing_state"] == "garage_search"
+    blocked_quote = admin_client.patch(
+        f"/api/admin/orders/{ref}/quote",
+        json={"items": [{"id": item_id, "unit_price_usd": 4000}]},
+    )
+    assert blocked_quote.status_code == 400
+
+    available = admin_client.patch(
+        f"/api/admin/orders/{ref}/availability",
+        json={"items": [{"id": item_id, "sourcing_state": "available"}]},
+    )
+    assert available.status_code == 200
+
     # Admin prices the proforma
     quoted = admin_client.patch(
         f"/api/admin/orders/{ref}/quote",
         json={
-            "items": [{"id": order["items"][0]["id"], "unit_price_usd": 4000}],
+            "items": [{"id": item_id, "unit_price_usd": 4000, "sourcing_state": "available"}],
             "freight": 900,
             "insurance": 80,
             "clearing": 450,
@@ -95,6 +114,7 @@ def test_order_flow_to_delivery(app, client, admin_client, customer, engine):
     assert quoted.status_code == 200, quoted.get_json()
     quoted_order = quoted.get_json()["order"]
     assert quoted_order["status"] == "quoted"
+    assert quoted_order["items"][0]["sourcing_state"] == "available"
     assert quoted_order["breakdown"]["goods_total"] == 8000
     assert quoted_order["breakdown"]["deposit_due"] == round(quoted_order["breakdown"]["total"] * 0.5, 2)
 
@@ -118,6 +138,7 @@ def test_order_flow_to_delivery(app, client, admin_client, customer, engine):
     assert confirmed.status_code == 200
     settled = confirmed.get_json()["order"]
     assert settled["status"] == "deposit_paid"
+    assert settled["items"][0]["sourcing_state"] == "reserved"
     assert settled["breakdown"]["paid_total"] == quoted_order["breakdown"]["deposit_due"]
 
     # Cannot close while balance outstanding
@@ -146,6 +167,44 @@ def test_order_flow_to_delivery(app, client, admin_client, customer, engine):
     statuses = [e["status"] for e in delivered.get_json()["order"]["events"]]
     assert statuses[0] == "quote_requested"
     assert "quoted" in statuses and statuses[-1] == "delivered"
+
+
+def test_partial_deposit_does_not_reserve_engine(app, client, admin_client, customer, engine):
+    created = client.post(
+        "/api/orders", json={"items": [{"engine_id": engine["id"], "quantity": 1}]}
+    )
+    order = created.get_json()["order"]
+    reference = order["reference"]
+    item_id = order["items"][0]["id"]
+
+    admin_client.patch(
+        f"/api/admin/orders/{reference}/quote",
+        json={"items": [{"id": item_id, "unit_price_usd": engine["guide_price_usd"]}]},
+    )
+    partial = client.post(
+        f"/api/orders/{reference}/payments",
+        json={"method": "cash_on_delivery", "amount_usd": 1},
+    )
+    admin_client.post(
+        f"/api/admin/payments/{partial.get_json()['payment']['id']}/confirm",
+        json={"confirm": True},
+    )
+    after_partial = client.get(f"/api/orders/{reference}").get_json()["order"]
+    assert after_partial["status"] == "quoted"
+    assert after_partial["items"][0]["sourcing_state"] == "available"
+
+    remaining = after_partial["breakdown"]["deposit_due"] - after_partial["breakdown"]["paid_total"]
+    final_deposit = client.post(
+        f"/api/orders/{reference}/payments",
+        json={"method": "cash_on_delivery", "amount_usd": remaining},
+    )
+    admin_client.post(
+        f"/api/admin/payments/{final_deposit.get_json()['payment']['id']}/confirm",
+        json={"confirm": True},
+    )
+    after_deposit = client.get(f"/api/orders/{reference}").get_json()["order"]
+    assert after_deposit["status"] == "deposit_paid"
+    assert after_deposit["items"][0]["sourcing_state"] == "reserved"
 
 
 def test_customers_cannot_read_other_orders(app, engine):

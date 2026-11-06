@@ -4,8 +4,8 @@ import { api } from "../lib/api";
 import { LoadingButton } from "./Loading";
 
 /**
- * Art-directed placeholder: a drawing of the engine family rather than a photo.
- * Swap in real photography later by setting `image_url` on the engine.
+ * Shows an uploaded catalogue reference photo when available, otherwise an illustration.
+ * Catalogue photos represent an engine type and do not indicate current stock.
  */
 export function EngineArt({ engine, className = "" }) {
   if (engine?.image_url) {

@@ -133,7 +133,9 @@ export default function OrderDetail() {
               <div className="cart-line" key={item.id}>
                 <div>
                   <strong>{item.title}</strong>
-                  <div className="muted small">× {item.quantity} · sourcing: {item.sourcing_state.replace("_", " ")}</div>
+                  <div className="muted small">
+                    × {item.quantity} · {item.sourcing_state_label || "Checking Dubai availability"}
+                  </div>
                   {(item.lot_number || item.serial_number) && (
                     <div className="mono small" style={{ marginTop: "0.3rem" }}>
                       {item.lot_number && <>lot {item.lot_number} </>}
@@ -243,10 +245,18 @@ export default function OrderDetail() {
 
           {order.status === "quote_requested" && (
             <p className="notice" style={{ marginTop: "1.2rem" }}>
-              We are confirming supplier availability. You&apos;ll receive a proforma invoice by
-              email and WhatsApp — payment opens once the quote is issued.
+              {order.items.some((item) => item.sourcing_state === "garage_search")
+                ? "The supplier option is not currently available. Our Dubai team is searching local garages and will send a quote when a suitable engine is found."
+                : order.items.some((item) => item.sourcing_state === "available")
+                  ? "Availability is confirmed. We are preparing your proforma; the engine is reserved once you approve the quote and pay the deposit."
+                  : "We are checking Dubai suppliers. If they do not have a match, our team searches local garages. You will receive a proforma once a suitable engine is confirmed."}
             </p>
           )}
+
+          <div className="trust-item" style={{ marginTop: "1.2rem" }}>
+            <h3>Fitting in Zimbabwe</h3>
+            <p>After the engine arrives, fitting can be arranged through our trusted mechanic as a separate service.</p>
+          </div>
 
           {user?.is_admin && (
             <p className="fineprint">

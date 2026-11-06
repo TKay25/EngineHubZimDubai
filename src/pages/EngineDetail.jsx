@@ -73,7 +73,11 @@ export default function EngineDetail() {
         <section>
           <div className="engine-art-block">
             <EngineArt engine={engine} className="engine-art-large" />
-            <span className="art-caption">Reference illustration — real unit photos are supplied in your proforma</span>
+            <span className="art-caption">
+              {engine.image_url
+                ? "Example photo only — not a current stock listing; availability is checked per request"
+                : "Illustrative reference — actual unit photos are shared after sourcing"}
+            </span>
           </div>
 
           <dl className="specs">
@@ -140,8 +144,10 @@ export default function EngineDetail() {
           <div className="trust-item" style={{ marginTop: "1.2rem" }}>
             <h3>What happens next</h3>
             <p>
-              We confirm the unit in Dubai, record its supplier, lot and serial number, and issue a
-              proforma. Payment opens once that proforma is accepted.
+              We check suppliers in Dubai. If there is no available match, our local team searches
+              garages. Once you approve the proforma and pay the deposit, we reserve the available
+              engine and arrange shipment. Fitting with our trusted mechanic can be arranged after
+              arrival in Zimbabwe as a separate service.
             </p>
           </div>
         </aside>

@@ -262,11 +262,6 @@ def set_quote(reference):
         raw_item = next(
             (i for i in data.get("items", []) if int(i.get("id", 0)) == item.id), None
         )
-        if item.sourcing_state == "garage_search":
-            return api_error(
-                "This engine is still being searched for in Dubai garages. "
-                "Update its availability before issuing the proforma."
-            )
         if raw_item and raw_item.get("sourcing_state"):
             sourcing_state = str(raw_item["sourcing_state"]).strip()
             if sourcing_state == "garage_search":
@@ -279,6 +274,11 @@ def set_quote(reference):
             if sourcing_state == "reserved" and item.sourcing_state != "reserved":
                 return api_error("An engine can only be reserved after its deposit is confirmed.")
             item.sourcing_state = sourcing_state
+        if item.sourcing_state == "garage_search":
+            return api_error(
+                "This engine is still being searched for in Dubai garages. "
+                "Update its availability before issuing the proforma."
+            )
         if not raw_item:
             continue
         try:
@@ -288,8 +288,6 @@ def set_quote(reference):
         if price <= 0:
             return api_error("Engine prices must be greater than zero.")
         item.unit_price_usd = price
-        if raw_item.get("sourcing_state"):
-            item.sourcing_state = str(raw_item["sourcing_state"])[:32]
 
     for item in order.items:
         if item.sourcing_state == "requested":

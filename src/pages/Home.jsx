@@ -6,10 +6,10 @@ import { useAuth } from "../lib/auth";
 import { LoadingState } from "../components/Loading";
 
 const STEPS = [
-  ["Tell us what you need", "Send the model, engine code or the vehicle it goes in. A screenshot or VIN is enough."],
-  ["We confirm availability", "Our Dubai desk verifies supplier stock, inspects the unit and issues a proforma invoice."],
-  ["Reserve with a deposit", "Paynow, RTGS or cash on delivery. The deposit secures sourcing — nothing is taken up front."],
-  ["We ship, clear and deliver", "Export, sea freight, ZIMRA duty, clearing and delivery — tracked at every step."],
+  ["Tell us what you need", "Nothing is held in stock. Send the engine code, VIN or vehicle details."],
+  ["We check Dubai availability", "If suppliers do not have a match, our team on the ground searches local garages."],
+  ["Review and reserve", "Approve the proforma and pay the deposit; then we reserve the available engine for you."],
+  ["Ship, deliver and fit", "We ship and clear it into Zimbabwe. Fitting is available through our trusted mechanic after arrival."],
 ];
 
 const TRUST = [
@@ -218,6 +218,14 @@ export default function Home() {
           <div className="engine-grid">
             {featured.map((e) => (
               <Link className="engine-card" key={e.id} to={`/engines/${e.id}`}>
+                {e.image_url && (
+                  <img
+                    className="engine-card-photo"
+                    src={e.image_url}
+                    alt={`${e.title} example photo`}
+                    loading="lazy"
+                  />
+                )}
                 <div className="engine-card-top">
                   <span className="engine-code">{e.make} · {e.model_code}</span>
                   <span className="pill ok">{e.warranty_days || 90}d warranty</span>
@@ -268,8 +276,8 @@ export default function Home() {
             <p className="eyebrow" style={{ color: "#8f8a7e" }}>Ready to start</p>
             <h2>Send us the engine. We&apos;ll price it landed.</h2>
             <p>
-              No payment until you have seen the proforma. If we cannot find the unit, we tell you
-              what it would take to get it.
+              No payment until you have seen the proforma. If suppliers do not have the engine, our
+              Dubai team searches local garages and shares a quote when a suitable match is found.
             </p>
           </div>
           <div style={{ display: "flex", gap: "0.7rem", flexWrap: "wrap" }}>

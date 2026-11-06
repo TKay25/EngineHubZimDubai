@@ -83,9 +83,11 @@ and **Admin ? Catalog**:
 | Chat conversations and bot state | `chat_messages`, `chat_sessions` |
 | Quote requests captured before an account exists | `leads` |
 
-`SEED_DEMO_DATA=false` (the production default) starts with an **empty catalog** ? you add
-your real engine types in the admin console, and the site/bot pick them up immediately.
-No company details, prices or rates are hard-coded in the Python or React sources.
+`SEED_DEMO_DATA=false` (the production default) starts with an **empty catalog** — you add
+the engine types you can source in the admin console, and the site/bot pick them up immediately.
+Upload a JPEG, PNG or WebP reference photo, or enter an image URL. Catalogue photos are examples,
+not proof that an engine is currently in stock. No company details, prices or rates are hard-coded
+in the Python or React sources.
 
 ## Configuration
 
@@ -94,6 +96,7 @@ All settings come from environment variables (see `.env.example`). Never commit 
 | Variable | Purpose |
 |---|---|
 | `DATABASE_URL` | Render/Postgres connection string (`postgres://` is auto-normalised) |
+| `ENGINE_IMAGE_DIR` | Engine-photo storage path; point this to a persistent volume in production |
 | `SECRET_KEY` | Session signing key |
 | `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Creates the first admin on boot if absent |
 | `WHATSAPP_VERIFY_TOKEN` | Webhook verification token you set in the Meta app |
@@ -135,9 +138,11 @@ Open `index.html` to preview and download individual posters; image credits and 
 (with `cancelled` before payment).
 
 - Customer submits a sourcing request (web cart or WhatsApp) - no payment is taken yet.
+- The Dubai desk checks supplier availability. If an engine is not available, the team searches local garages; that sourcing state is shown on the customer's request.
 - Admin sets supplier pricing, freight/insurance/clearing/inland, duty/VAT/surtax and deposit %; the status becomes `quoted` and the customer is notified on WhatsApp.
-- Customer pays the deposit via Paynow, bank transfer (uploads proof for admin confirmation) or records cash on delivery.
+- Customer approves the proforma and pays the full deposit via Paynow, bank transfer (uploads proof for admin confirmation) or records cash on delivery. The confirmed available engine is then marked reserved.
 - Admin advances status; each change is timestamped in the order timeline and pushed to WhatsApp.
+- After arrival in Zimbabwe, fitting is available through the trusted mechanic as a separate service.
 - Delivery is blocked while a balance remains outstanding.
 
 ## WhatsApp bot
@@ -175,4 +180,5 @@ Add the WhatsApp and Paynow secrets under the service Environment tab.
 
 - Paynow integration follows the documented web-initiation/hash contract but has not been exercised against live Paynow credentials.
 - Proof-of-payment files are stored on the web instance local disk (`uploads/proofs`); use object storage if you scale to multiple instances or redeploy often.
+- Engine photos are stored on local disk under `uploads/engines` by default. On Render, attach a persistent disk and set `ENGINE_IMAGE_DIR` to a directory on its mount (for example `/var/data/engines`) before uploading production photos; otherwise files can be lost when the service is replaced or redeployed.
 - `bootstrap.py` does additive `ALTER TABLE` migrations only; introduce Alembic/Flask-Migrate before making destructive schema changes.

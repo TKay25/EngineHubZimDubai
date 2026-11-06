@@ -64,8 +64,8 @@ export default function Catalog() {
           <p className="eyebrow">Sourcing catalogue</p>
           <h1>Engines</h1>
           <p className="lede">
-            Families we source regularly from Dubai. Nothing is held in stock — request a type and
-            we confirm availability, inspect the unit and quote the landed cost.
+            Engine types we can search for — not stock listings. Request one and we check Dubai
+            suppliers; if it is unavailable, our team searches local garages before quoting.
           </p>
         </div>
         <div className="meta" style={{ textAlign: "right" }}>
@@ -132,10 +132,18 @@ export default function Catalog() {
         <div className="engine-grid">
           {engines.map((engine) => (
             <Link className="engine-card" key={engine.id} to={`/engines/${engine.id}`}>
+              {engine.image_url && (
+                <img
+                  className="engine-card-photo"
+                  src={engine.image_url}
+                  alt={`${engine.title} example photo`}
+                  loading="lazy"
+                />
+              )}
               <div className="engine-card-top">
                 <span className="engine-code">{engine.make} · {engine.model_code}</span>
                 {engine.sourcing_available ? (
-                  <span className="pill ok">Sourcing</span>
+                  <span className="pill ok">Sourced on request</span>
                 ) : (
                   <span className="pill muted">Paused</span>
                 )}
