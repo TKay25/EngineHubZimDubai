@@ -64,205 +64,205 @@ const photoData = new Map();
 const posters = [
   {
     slug: "the-right-engine",
-    title: "The right engine. The right journey.",
+    title: "First you ask. Then we search.",
     layout: "cover",
     photo: "toyota-1hz.jpg",
-    eyebrow: "ENGINES SOURCED TO ORDER",
-    headline: ["THE RIGHT ENGINE.", "THE RIGHT JOURNEY."],
-    body: ["Tell us what you drive.", "We will source, inspect and quote it landed."],
-    detail: "Dubai sourcing · Zimbabwe delivery",
+    eyebrow: "CUSTOMER-REQUESTED ENGINE SOURCING",
+    headline: ["TELL US WHAT", "YOU NEED."],
+    body: ["Share your engine code, VIN or vehicle details.", "We check availability and send you an option and quote."],
+    detail: "You approve before we process shipment.",
   },
   {
     slug: "toyota-1hz",
-    title: "Toyota 1HZ — a Land Cruiser classic",
+    title: "Toyota 1HZ — sourced on request",
     layout: "split",
     photo: "toyota-1hz.jpg",
     eyebrow: "TOYOTA · 4.2L DIESEL",
-    headline: ["THE 1HZ.", "A LAND CRUISER", "CLASSIC."],
-    body: ["A legendary six-cylinder workhorse.", "Sourced to order, with a clear landed quote."],
-    detail: "Model reference: Toyota 1HZ",
+    headline: ["THE TOYOTA 1HZ.", "SOURCED ON REQUEST."],
+    body: ["Looking for a Land Cruiser 1HZ?", "We search, share an option and quote for your approval."],
+    detail: "Example model only · availability checked per request.",
   },
   {
     slug: "hilux-1kd-ftv",
-    title: "Hilux 1KD-FTV — built for the long run",
+    title: "Looking for a Hilux 1KD-FTV?",
     layout: "editorial",
     photo: "toyota-1kd-ftv.jpg",
     eyebrow: "FOR HILUX & FORTUNER",
-    headline: ["KEEP THE WORK", "MOVING."],
-    body: ["Toyota 1KD-FTV 3.0 D-4D.", "Ask us to check sourcing and fitment for your vehicle."],
-    detail: "Model reference: Toyota 1KD-FTV",
+    headline: ["ASK US TO", "SEARCH FOR IT."],
+    body: ["Share your 1KD-FTV and vehicle details.", "We'll check availability and quote an option before you decide."],
+    detail: "You approve the option before we process it to ship.",
   },
   {
     slug: "the-right-fit",
-    title: "The engine that fits. Not a guess.",
+    title: "You ask. We search. You decide.",
     layout: "route",
     photo: "engine-inspection.jpg",
     eyebrow: "START WITH YOUR VEHICLE",
-    headline: ["THE ENGINE", "THAT FITS.", "NOT A GUESS."],
-    body: ["Share your engine code, VIN or vehicle details.", "We will check the fitment and sourcing options."],
-    detail: "Code · VIN · vehicle model",
+    headline: ["YOU ASK.", "WE SEARCH.", "YOU DECIDE."],
+    body: ["Share your engine code, VIN or vehicle details.", "Review the available option and quote before you approve."],
+    detail: "No order or shipment before your approval.",
   },
   {
     slug: "dubai-to-zimbabwe",
-    title: "From Dubai to Zimbabwe",
+    title: "From your request to shipment",
     layout: "route",
     photo: "isuzu-6uz1.jpg",
-    eyebrow: "ONE SOURCING JOURNEY",
-    headline: ["DUBAI TO", "ZIMBABWE."],
-    body: ["Your request, sourced to order.", "Freight, duty, clearing and delivery in one clear quote."],
-    detail: "Sourcing desk in Dubai · delivery across Zimbabwe",
+    eyebrow: "A CUSTOMER-APPROVED JOURNEY",
+    headline: ["YOUR REQUEST.", "YOUR APPROVAL.", "THEN IT SHIPS."],
+    body: ["We search in Dubai and share an available option.", "When you approve the quote, we process the shipment."],
+    detail: "Request → source → review → approve → ship",
   },
   {
     slug: "inspect-before-export",
-    title: "Inspect first. Move forward with confidence.",
+    title: "We search after you ask",
     layout: "cover",
     photo: "engine-inspection.jpg",
-    eyebrow: "BEFORE THE ENGINE SHIPS",
-    headline: ["INSPECT FIRST.", "MOVE FORWARD."],
-    body: ["Compression test. Oil-pressure check.", "A video walk-around before export."],
-    detail: "Inspection process confirmed per unit",
+    eyebrow: "NO SPECULATIVE ENGINE STOCK",
+    headline: ["NO STOCK.", "NO GUESSWORK."],
+    body: ["Request the engine you need; we check availability.", "Review the option and landed quote before approval."],
+    detail: "We process shipping only after you approve.",
   },
   {
     slug: "landed-cost",
-    title: "Know your landed cost first",
+    title: "Know the landed cost. Then decide.",
     layout: "cost",
     photo: "mercedes-om642.jpg",
     eyebrow: "A CLEARER WAY TO IMPORT",
     headline: ["KNOW THE", "LANDED COST."],
-    body: ["Review every line before you decide.", "Final figures are confirmed on your proforma."],
-    detail: "No guesswork. Just a clear quote.",
+    body: ["Review the found engine option and itemised quote.", "Approve when you're ready; then we process shipping."],
+    detail: "Quote first · your approval next · shipping after",
   },
   {
     slug: "no-guesswork",
-    title: "No guesswork. Just the right details.",
+    title: "We find an option. You choose.",
     layout: "split",
     photo: "mitsubishi-4d56.jpg",
-    eyebrow: "SOURCE WITH CLARITY",
-    headline: ["NO GUESSWORK.", "JUST THE", "RIGHT DETAILS."],
-    body: ["Tell us your vehicle and engine code.", "We will check sourcing, fitment and landed cost."],
-    detail: "Engine sourcing made straightforward",
+    eyebrow: "SOURCING WITH YOUR APPROVAL",
+    headline: ["WE FIND AN", "OPTION.", "YOU CHOOSE."],
+    body: ["Tell us your vehicle and engine code.", "We'll check availability and share a quote to review."],
+    detail: "Shipment starts after you approve the option.",
   },
   {
     slug: "diesel-sourcing",
-    title: "Diesel power, sourced to order",
+    title: "Diesel engines. Searched on request.",
     layout: "dark",
     photo: "nissan-yd25.jpg",
     eyebrow: "DIESEL ENGINES",
-    headline: ["DIESEL POWER.", "SOURCED TO", "YOUR BRIEF."],
-    body: ["From everyday vehicles to hard-working fleets.", "Start with the model, code or application."],
-    detail: "Availability and configuration confirmed by quote",
+    headline: ["DIESEL POWER.", "SOURCED ON", "YOUR REQUEST."],
+    body: ["Share your model, engine code or vehicle details.", "We check availability and price before you decide."],
+    detail: "No engines held in stock · availability confirmed per request",
   },
   {
     slug: "fleet-power",
-    title: "Power for the work ahead",
+    title: "Looking for a fleet engine?",
     layout: "technical",
     photo: "isuzu-6uz1.jpg",
     modelMark: "6UZ1",
     eyebrow: "COMMERCIAL & FLEET",
-    headline: ["POWER FOR THE", "WORK AHEAD."],
-    body: ["Tell us your truck, bus or fleet application.", "We will check the engine options to source."],
-    detail: "Commercial diesel sourcing",
+    headline: ["REQUEST IT.", "WE'LL SEARCH."],
+    body: ["Tell us the truck, bus or fleet engine you need.", "We share an available option and quote for your approval."],
+    detail: "Your approval comes before we process shipment.",
   },
   {
     slug: "one-sourcing-desk",
-    title: "One desk. Two countries. One clear plan.",
+    title: "One sourcing journey. Your decision first.",
     layout: "arch",
     photo: "mercedes-om642.jpg",
-    eyebrow: "A MORE CONNECTED IMPORT",
-    headline: ["ONE DESK.", "TWO COUNTRIES.", "ONE CLEAR PLAN."],
-    body: ["Dubai sourcing, Zimbabwe delivery.", "One team to guide the journey from request to arrival."],
-    detail: "Dubai → Zimbabwe",
+    eyebrow: "FROM DUBAI TO ZIMBABWE",
+    headline: ["ONE REQUEST.", "ONE QUOTE.", "YOUR DECISION."],
+    body: ["We search for your engine in Dubai.", "We process shipping only after you approve the option."],
+    detail: "Search · share · approve · ship",
   },
   {
     slug: "start-with-the-code",
-    title: "It starts with the engine code",
+    title: "It starts with your engine code",
     layout: "editorial",
     photo: "toyota-1kd-ftv.jpg",
     eyebrow: "A SIMPLE FIRST STEP",
-    headline: ["START WITH", "THE CODE."],
-    body: ["Send your engine code, VIN or vehicle model.", "We will take it from sourcing check to landed quote."],
-    detail: "Your vehicle details are a good place to begin",
+    headline: ["START WITH", "YOUR CODE."],
+    body: ["Send your engine code, VIN or vehicle model.", "We'll search, then send an option and quote to review."],
+    detail: "You choose whether to proceed before shipment.",
   },
   {
     slug: "clear-costs",
-    title: "Clear costs. Clear decisions.",
+    title: "See the full cost before you decide",
     layout: "cost",
     photo: "isuzu-6uz1.jpg",
     eyebrow: "NO HIDDEN LINES",
-    headline: ["CLEAR COSTS.", "CLEAR DECISIONS."],
-    body: ["Duty, VAT, freight, clearing and inland delivery.", "Each item shown before you decide."],
-    detail: "An itemised landed-cost quote",
+    headline: ["CLEAR COSTS.", "YOUR CALL."],
+    body: ["Review the engine option, freight, duty and delivery.", "Approve the quote before we process shipping."],
+    detail: "An itemised quote for your approval.",
   },
   {
     slug: "source-to-order",
-    title: "Your engine, sourced to order",
+    title: "No stock. We search on request.",
     layout: "arch",
     photo: "toyota-1hz.jpg",
-    eyebrow: "PRE-ORDER ENGINE SOURCING",
-    headline: ["YOUR ENGINE.", "SOURCED TO", "YOUR ORDER."],
-    body: ["We do not hold speculative engine stock.", "Tell us what you need and we will check the options."],
-    detail: "A sourcing request built around your vehicle",
+    eyebrow: "CUSTOMER-REQUESTED ENGINE SOURCING",
+    headline: ["NO STOCK.", "WE SEARCH", "ON REQUEST."],
+    body: ["Tell us the engine and vehicle you need.", "Review the option and price before you decide."],
+    detail: "We process your shipment only after approval.",
   },
   {
     slug: "toyota-1kd-ftv",
-    title: "Toyota 1KD-FTV — diesel power",
+    title: "Toyota 1KD-FTV — ask us to search",
     layout: "technical",
     photo: "toyota-1kd-ftv.jpg",
     modelMark: "1KD-FTV",
     eyebrow: "TOYOTA · 3.0 D-4D",
-    headline: ["THE 1KD-FTV.", "READY FOR THE ROAD."],
-    body: ["Sourcing to order for compatible Hilux and Fortuner models.", "Ask us to confirm your exact specification."],
-    detail: "Model reference: Toyota 1KD-FTV",
+    headline: ["LOOKING FOR", "A 1KD-FTV?"],
+    body: ["We'll search for the specification you request.", "You approve the found option and quote before shipment."],
+    detail: "Example model only · availability confirmed per request.",
   },
   {
     slug: "mitsubishi-4d56",
-    title: "Mitsubishi 4D56 — steady diesel power",
+    title: "Mitsubishi 4D56 — availability checked on request",
     layout: "cover",
     photo: "mitsubishi-4d56.jpg",
     eyebrow: "MITSUBISHI · 2.5L DIESEL",
-    headline: ["STEADY POWER.", "SOURCED RIGHT."],
-    body: ["Looking for a Mitsubishi 4D56?", "Share your vehicle details for a sourcing check."],
-    detail: "Model reference: Mitsubishi 4D56",
+    headline: ["LOOKING FOR", "A 4D56?"],
+    body: ["Tell us your vehicle and engine details.", "We'll check availability and quote an option."],
+    detail: "If you approve, we process it for shipment.",
   },
   {
     slug: "nissan-yd25",
-    title: "Nissan YD25 — power for the road ahead",
+    title: "Nissan YD25 — let's check availability",
     layout: "dark",
     photo: "nissan-yd25.jpg",
     eyebrow: "NISSAN · 2.5L DIESEL",
-    headline: ["THE YD25.", "POWER FOR", "THE ROAD AHEAD."],
-    body: ["Sourcing options for Nissan Navara and NP300.", "Confirm your engine code and fitment with us."],
-    detail: "Model reference: Nissan YD25",
+    headline: ["LOOKING FOR", "A YD25?", "LET'S SEARCH."],
+    body: ["Share the exact engine code and vehicle.", "We confirm a sourcing option and quote before you decide."],
+    detail: "No shipment is processed before your approval.",
   },
   {
     slug: "mercedes-om642",
-    title: "Mercedes OM642 — precision in every detail",
+    title: "Mercedes OM642 — sourced by request",
     layout: "arch",
     photo: "mercedes-om642.jpg",
     eyebrow: "MERCEDES-BENZ · V6 DIESEL",
-    headline: ["PRECISION", "STARTS WITH", "THE RIGHT PART."],
-    body: ["Looking for an OM642 3.0 CDI?", "We will check sourcing against your vehicle details."],
-    detail: "Model reference: Mercedes-Benz OM642",
+    headline: ["DETAILS FIRST.", "SEARCH NEXT.", "YOUR CHOICE."],
+    body: ["Send your vehicle and OM642 details.", "We'll search and share an option and quote to review."],
+    detail: "Shipment is processed only after you approve.",
   },
   {
     slug: "the-full-picture",
-    title: "The full picture, before you commit",
+    title: "Review the option. Approve the quote.",
     layout: "cost",
     photo: "engine-inspection.jpg",
-    eyebrow: "BETTER INFORMATION FIRST",
-    headline: ["SEE THE", "FULL PICTURE."],
-    body: ["Inspection details and import costs matter.", "Get the information you need before confirming."],
-    detail: "Review the quote and inspection details",
+    eyebrow: "YOUR DECISION COMES FIRST",
+    headline: ["REVIEW IT.", "THEN DECIDE."],
+    body: ["We share the available engine option and landed cost.", "When you approve, we process it for shipment."],
+    detail: "A quote is an option to review, not stock on a shelf.",
   },
   {
     slug: "zimosaka-autospares",
-    title: "ZimOsaka AutoSpares — your engine, sourced from Dubai",
+    title: "Request. Approve. Ship. Fit in Zimbabwe.",
     layout: "dark",
     photo: "isuzu-6uz1.jpg",
     eyebrow: "ZIMOSAKA AUTOSPARES",
-    headline: ["YOUR ENGINE.", "SOURCED FROM", "DUBAI."],
-    body: ["Complete engines sourced to order.", "Delivered across Zimbabwe with a clear landed quote."],
-    detail: "Dubai sourcing · Zimbabwe delivery",
+    headline: ["SOURCED TO", "YOUR REQUEST.", "FITTED HERE."],
+    body: ["You review and approve an available option before shipment.", "After arrival, our trusted mechanic fits the engine in Zimbabwe."],
+    detail: "Request → approval → shipment → fitting in Zimbabwe",
   },
 ];
 
@@ -336,11 +336,13 @@ function footer(poster, dark = false, y = 1242) {
   const photo = photos[poster.photo];
   return `
     <path d="M72 ${y}H1008" stroke="${rule}" stroke-width="1"/>
-    ${text(72, y + 31, "ILLUSTRATIVE IMAGE · EXACT SPECIFICATION, AVAILABILITY & PRICE CONFIRMED BY QUOTE", 11.5, ink, { weight: 600, letterSpacing: 0.45 })}
+    ${text(72, y + 31, "NO STOCK HELD · AVAILABILITY & PRICE CONFIRMED AFTER YOUR REQUEST", 11.5, ink, { weight: 600, letterSpacing: 0.45 })}
     <a href="${escapeXml(photo.source)}">
-      ${text(72, y + 59, `PHOTO: ${photo.author} / WIKIMEDIA COMMONS · ${photo.credit}`, 11.5, ink, { weight: 500, letterSpacing: 0.25 })}
+      ${text(72, y + 59, `PHOTO: ${photo.author} / WIKIMEDIA COMMONS`, 11.5, ink, { weight: 500, letterSpacing: 0.25 })}
     </a>
-    <a href="${escapeXml(photo.license)}"><title>${escapeXml(photo.credit)} license</title></a>
+    <a href="${escapeXml(photo.license)}">
+      ${text(72, y + 81, `LICENSE: ${photo.credit} · CROPPED & PLACED IN POSTER ARTWORK`, 11.5, ink, { weight: 500, letterSpacing: 0.25 })}
+    </a>
   `;
 }
 
@@ -351,7 +353,7 @@ function documentStart(poster, index) {
 <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350" role="img" aria-labelledby="title desc">
   <title id="title">${safeTitle}</title>
   <desc id="desc">${safeDescription}</desc>
-  <metadata>ZimOsaka AutoSpares poster ${String(index + 1).padStart(2, "0")} of 20. Photo is illustrative; see CREDITS.md for image attribution and license.</metadata>
+  <metadata>ZimOsaka AutoSpares poster ${String(index + 1).padStart(2, "0")} of 20. Photo and engine model are illustrative examples, not stock listings. See CREDITS.md for image attribution and license.</metadata>
   <defs>
     <linearGradient id="photoShade" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="${palette.navyDeep}" stop-opacity=".16"/>
@@ -367,7 +369,7 @@ function documentStart(poster, index) {
       <path d="M44 0H0V44" fill="none" stroke="${palette.gold}" stroke-opacity=".11" stroke-width="1"/>
     </pattern>
     <clipPath id="editorialFrame"><rect x="72" y="420" width="936" height="485" rx="18"/></clipPath>
-    <clipPath id="routeFrame"><rect x="72" y="518" width="936" height="402" rx="18"/></clipPath>
+    <clipPath id="routeFrame"><rect x="72" y="538" width="936" height="382" rx="18"/></clipPath>
     <clipPath id="costFrame"><rect x="562" y="385" width="446" height="488" rx="18"/></clipPath>
     <clipPath id="technicalFrame"><rect x="72" y="296" width="936" height="520" rx="18"/></clipPath>
     <clipPath id="archFrame"><path d="M620 1085V505c0-205 94-340 220-340s220 135 220 340v580Z"/></clipPath>
@@ -387,7 +389,7 @@ function layoutCover(poster) {
     <path d="M72 802h64" stroke="${palette.goldInk}" stroke-width="3"/>
     ${text(72, 847, poster.detail, 15, palette.goldInk, { weight: 700, letterSpacing: 1.05 })}
     ${lines(72, 913, poster.body, 23, 36, palette.navy, { weight: 400 })}
-    ${button(72, 1058, "REQUEST A LANDED QUOTE")}
+    ${button(72, 1058, "REQUEST AN ENGINE SEARCH")}
     ${footer(poster, false, 1227)}
   `;
 }
@@ -402,11 +404,11 @@ function layoutSplit(poster) {
     ${rect(552, 0, 6, 1170, palette.gold)}
     ${brand(62, 70, false)}
     ${eyebrow(70, 252, poster.eyebrow, palette.goldInk)}
-    ${lines(70, 357, poster.headline, 60, 72, palette.navy, { serif: true, weight: 700 })}
+    ${lines(70, 357, poster.headline, 48, 58, palette.navy, { serif: true, weight: 700 })}
     <path d="M70 630h84" stroke="${palette.goldInk}" stroke-width="3"/>
     ${text(70, 684, poster.detail, 14, palette.navy, { weight: 700, letterSpacing: 0.7 })}
     ${lines(70, 748, poster.body, 19, 32, palette.navy, { weight: 400 })}
-    ${button(70, 958, "REQUEST A LANDED QUOTE")}
+    ${button(70, 958, "REQUEST AN ENGINE SEARCH")}
     ${rect(0, 1170, 1080, 180, palette.navy)}
     ${footer(poster, true, 1200)}
   `;
@@ -424,28 +426,30 @@ function layoutEditorial(poster) {
     <path d="M943 868h38m-13-13 13 13-13 13" fill="none" stroke="${palette.navyDeep}" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
     ${text(72, 994, poster.detail, 14, palette.goldInk, { weight: 700, letterSpacing: 1.1 })}
     ${lines(72, 1040, poster.body, 18, 30, palette.navy, { weight: 400 })}
-    ${button(72, 1137, "REQUEST A LANDED QUOTE")}
+    ${button(72, 1137, "REQUEST AN ENGINE SEARCH")}
     ${footer(poster, false, 1235)}
   `;
 }
 
 function layoutRoute(poster) {
+  const headlineSize = poster.headline.length >= 3 ? 60 : 67;
+  const headlineLineHeight = poster.headline.length >= 3 ? 66 : 74;
   return `
     ${rect(0, 0, 1080, 1350, palette.paper)}
     ${brand(72, 62, false)}
     ${eyebrow(76, 194, poster.eyebrow)}
-    ${lines(72, 275, poster.headline, 67, 74, palette.navy, { serif: true, weight: 700 })}
-    <path d="M102 460H978" fill="none" stroke="${palette.gold}" stroke-width="3"/>
-    <circle cx="122" cy="460" r="13" fill="${palette.goldInk}"/>
-    <circle cx="958" cy="460" r="13" fill="${palette.navy}"/>
-    <path d="M930 449l28 11-28 11" fill="none" stroke="${palette.navy}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    ${text(122, 436, "DUBAI", 12, palette.navy, { weight: 700, letterSpacing: 1.6, anchor: "middle" })}
-    ${text(958, 436, "ZIMBABWE", 12, palette.navy, { weight: 700, letterSpacing: 1.6, anchor: "middle" })}
-    ${image(poster, 72, 518, 936, 402, "routeFrame")}
-    ${rect(72, 518, 936, 402, "none", 18, `stroke="${palette.goldInk}" stroke-opacity=".45" stroke-width="2"`)}
+    ${lines(72, 275, poster.headline, headlineSize, headlineLineHeight, palette.navy, { serif: true, weight: 700 })}
+    <path d="M102 480H978" fill="none" stroke="${palette.gold}" stroke-width="3"/>
+    <circle cx="122" cy="480" r="13" fill="${palette.goldInk}"/>
+    <circle cx="958" cy="480" r="13" fill="${palette.navy}"/>
+    <path d="M930 469l28 11-28 11" fill="none" stroke="${palette.navy}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    ${text(122, 456, "DUBAI", 12, palette.navy, { weight: 700, letterSpacing: 1.6, anchor: "middle" })}
+    ${text(958, 456, "ZIMBABWE", 12, palette.navy, { weight: 700, letterSpacing: 1.6, anchor: "middle" })}
+    ${image(poster, 72, 538, 936, 382, "routeFrame")}
+    ${rect(72, 538, 936, 382, "none", 18, `stroke="${palette.goldInk}" stroke-opacity=".45" stroke-width="2"`)}
     ${text(72, 985, poster.detail, 14, palette.goldInk, { weight: 700, letterSpacing: 0.65 })}
     ${lines(72, 1033, poster.body, 18, 30, palette.navy)}
-    ${button(72, 1128, "REQUEST A LANDED QUOTE")}
+    ${button(72, 1128, "REQUEST AN ENGINE SEARCH")}
     ${footer(poster, false, 1231)}
   `;
 }
@@ -469,7 +473,7 @@ function layoutCost(poster) {
     ${rect(562, 385, 446, 488, "none", 18, `stroke="${palette.goldInk}" stroke-opacity=".5" stroke-width="2"`)}
     ${text(72, 944, poster.detail, 14, palette.goldInk, { weight: 700, letterSpacing: 0.65 })}
     ${lines(72, 995, poster.body, 18, 30, palette.navy)}
-    ${button(72, 1104, "REQUEST A LANDED QUOTE")}
+    ${button(72, 1104, "REQUEST AN ENGINE SEARCH")}
     ${footer(poster, false, 1231)}
   `;
 }
@@ -487,7 +491,7 @@ function layoutTechnical(poster) {
     <path d="M72 862h80" stroke="${palette.gold}" stroke-width="3"/>
     ${lines(72, 928, poster.headline, 55, 62, palette.white, { serif: true, weight: 700 })}
     ${lines(72, 1072, poster.body, 16, 25, "#dbe3ee")}
-    ${button(72, 1146, "REQUEST A LANDED QUOTE", true)}
+    ${button(72, 1146, "REQUEST AN ENGINE SEARCH", true)}
     ${footer(poster, true, 1237)}
   `;
 }
@@ -503,7 +507,7 @@ function layoutDark(poster) {
     <path d="M72 742h82" stroke="${palette.gold}" stroke-width="3"/>
     ${text(72, 794, poster.detail, 15, palette.gold, { weight: 700, letterSpacing: 1.1 })}
     ${lines(72, 860, poster.body, 21, 34, palette.white)}
-    ${button(72, 1065, "REQUEST A LANDED QUOTE", true)}
+    ${button(72, 1065, "REQUEST AN ENGINE SEARCH", true)}
     ${footer(poster, true, 1235)}
   `;
 }
@@ -516,11 +520,11 @@ function layoutArch(poster) {
     <path d="M620 1085V505c0-205 94-340 220-340s220 135 220 340v580Z" fill="none" stroke="${palette.gold}" stroke-width="3"/>
     ${brand(72, 62, false)}
     ${eyebrow(76, 260, poster.eyebrow)}
-    ${lines(72, 355, poster.headline, 55, 66, palette.navy, { serif: true, weight: 700 })}
+    ${lines(72, 355, poster.headline, 48, 60, palette.navy, { serif: true, weight: 700 })}
     <path d="M72 612h62" stroke="${palette.goldInk}" stroke-width="3"/>
     ${text(72, 668, poster.detail, 13, palette.goldInk, { weight: 700, letterSpacing: 0.3 })}
     ${lines(72, 729, poster.body, 17, 29, palette.navy)}
-    ${button(72, 968, "REQUEST A LANDED QUOTE")}
+    ${button(72, 968, "REQUEST AN ENGINE SEARCH")}
     ${footer(poster, false, 1235)}
   `;
 }
@@ -596,14 +600,14 @@ function galleryHtml() {
   <header>
     <div class="eyebrow">ZimOsaka AutoSpares · Campaign 01</div>
     <h1>Twenty ways to get the right engine moving.</h1>
-    <p>Premium, print-ready vector posters featuring illustrative engine photography. Review each design, download individual SVGs, or print the full A4 set.</p>
+    <p>Premium posters featuring illustrative engine photos. No engines are held in stock: request an engine, review its availability and quote, and approve before shipment is processed. Fitting is available in Zimbabwe with our trusted mechanic after arrival.</p>
     <div class="actions">
       <a href="print-all.html">Open A4 print set</a>
       <a class="secondary" href="CREDITS.md">Photo credits & licenses</a>
     </div>
   </header>
   <main><div class="grid">${cards}</div></main>
-  <footer>All engine images are illustrative, not current stock listings. Exact specification, availability and final price are confirmed by quotation.</footer>
+  <footer>Illustrative photos and model names only. We search on request, share the option and quote for your approval, then process shipment. Fitting is available in Zimbabwe with our trusted mechanic after arrival.</footer>
 </body>
 </html>
 `;
