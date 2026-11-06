@@ -15,13 +15,42 @@ from flask import Blueprint, current_app, jsonify, request, session, send_from_d
 from werkzeug.utils import secure_filename
 
 from auth_utils import admin_required, api_error, current_user, login_required
-from models import PAYMENT_METHODS, PAYMENT_METHOD_LABELS, Order, Payment, db
+from models import (
+    PAYMENT_METHODS,
+    PAYMENT_METHOD_LABELS,
+    Order,
+    OrderEvent,
+    Payment,
+    db,
+)
 from whatsapp import notify_customer
 
 bp = Blueprint("payments", __name__, url_prefix="/api")
 
 PROOF_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploads", "proofs")
 ALLOWED_PROOF_EXT = {".pdf", ".png", ".jpg", ".jpeg", ".webp"}
+
+
+def _record_deposit_if_complete(order, note):
+    if (
+        order.status in ("quote_requested", "quoted")
+        and order.paid_total >= order.deposit_due
+    ):
+        order.status = "deposit_paid"
+        order.reserve_available_items()
+        order.events.append(OrderEvent(status="deposit_paid", note=note))
+
+
+def _payment_confirmation_note(order, method):
+    if order.paid_total < order.deposit_due:
+        remaining = max(order.deposit_due - order.paid_total, 0)
+        return (
+            f"{method} confirmed. USD {remaining:,.2f} remains on the deposit before "
+            "an available engine can be reserved."
+        )
+    if any(item.sourcing_state == "reserved" for item in order.items):
+        return f"{method} confirmed. Your available engine is reserved for you."
+    return f"{method} confirmed."
 
 
 def _paynow_ready():
@@ -204,15 +233,9 @@ def confirm_payment(payment_id):
     payment.confirmed_at = datetime.now(timezone.utc) if confirm else None
 
     order = payment.order
-    if confirm and order.status in ("quoted", "quote_requested") and order.paid_total > 0:
-        order.status = "deposit_paid"
-        from models import OrderEvent
-
-        order.events.append(
-            OrderEvent(
-                status="deposit_paid",
-                note=f"Payment of USD {float(payment.amount_usd):,.2f} confirmed.",
-            )
+    if confirm:
+        _record_deposit_if_complete(
+            order, f"Payment of USD {float(payment.amount_usd):,.2f} confirmed."
         )
     db.session.commit()
 
@@ -221,7 +244,9 @@ def confirm_payment(payment_id):
         notify_customer(
             order,
             order.status,
-            extra=f"Payment of USD {float(payment.amount_usd):,.2f} received for {document}.",
+            extra=_payment_confirmation_note(
+                order, f"Payment of USD {float(payment.amount_usd):,.2f} for {document}"
+            ),
         )
     return jsonify({"payment": payment.to_dict(), "order": order.to_dict(include_customer=True)})
 
@@ -274,18 +299,11 @@ def paynow_result():
         payment.status = "confirmed"
         payment.confirmed_at = datetime.now(timezone.utc)
         payment.reference = data.get("paynowreference") or payment.reference
-        from models import OrderEvent
-
-        if order.status in ("quoted", "quote_requested"):
-            order.status = "deposit_paid"
-            order.events.append(
-                OrderEvent(
-                    status="deposit_paid",
-                    note=f"Paynow {data.get('paynowreference', '')} confirmed.",
-                )
-            )
+        _record_deposit_if_complete(
+            order, f"Paynow {data.get('paynowreference', '')} confirmed."
+        )
         db.session.commit()
-        notify_customer(order, order.status, extra="Paynow payment confirmed.")
+        notify_customer(order, order.status, extra=_payment_confirmation_note(order, "Paynow payment"))
     else:
         payment.status = "pending"
         payment.admin_note = f"Paynow status: {status}"[:255]
@@ -308,10 +326,6 @@ def simulate_payment(reference):
         return api_error("No payment to confirm.", 404)
     payment.status = "confirmed"
     payment.confirmed_at = datetime.now(timezone.utc)
-    if order.status in ("quoted", "quote_requested"):
-        from models import OrderEvent
-
-        order.status = "deposit_paid"
-        order.events.append(OrderEvent(status="deposit_paid", note="Sandbox payment confirmed."))
+    _record_deposit_if_complete(order, "Sandbox payment confirmed.")
     db.session.commit()
     return jsonify({"payment": payment.to_dict(), "order": order.to_dict()})

@@ -1,13 +1,17 @@
 """Public site settings + admin management of catalog and company settings."""
+import os
+import uuid
 from decimal import Decimal, InvalidOperation
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, current_app, jsonify, request
+from sqlalchemy.exc import SQLAlchemyError
 
 from auth_utils import admin_required, api_error
 from config import get_settings
 from models import Engine, db
 
 bp = Blueprint("settings_api", __name__, url_prefix="/api")
+ENGINE_IMAGE_URL_PREFIX = "/uploads/engines/"
 
 ENGINE_FIELDS = {
     "make": str,
@@ -30,6 +34,78 @@ ENGINE_FIELDS = {
     "sourcing_available": bool,
     "featured": bool,
 }
+
+
+def _engine_image_upload():
+    upload = request.files.get("image")
+    return upload if upload and upload.filename else None
+
+
+def _save_engine_image(upload):
+    extension = os.path.splitext(upload.filename)[1].lower()
+    header = upload.stream.read(12)
+    upload.stream.seek(0)
+    valid_signature = {
+        ".jpg": header.startswith(b"\xff\xd8\xff"),
+        ".jpeg": header.startswith(b"\xff\xd8\xff"),
+        ".png": header.startswith(b"\x89PNG\r\n\x1a\n"),
+        ".webp": header[:4] == b"RIFF" and header[8:12] == b"WEBP",
+    }.get(extension, False)
+    if not valid_signature:
+        raise ValueError("Upload a valid JPEG, PNG or WebP engine photo.")
+
+    filename = f"{uuid.uuid4().hex}{extension}"
+    directory = current_app.config["ENGINE_IMAGE_DIR"]
+    path = os.path.join(directory, filename)
+    os.makedirs(directory, exist_ok=True)
+    upload.save(path)
+    return ENGINE_IMAGE_URL_PREFIX + filename, path
+
+
+def _remove_file(path):
+    try:
+        os.remove(path)
+    except FileNotFoundError:
+        pass
+    except OSError:
+        current_app.logger.exception("Could not remove engine image %s", path)
+
+
+def _remove_engine_image(image_url):
+    if not image_url or not image_url.startswith(ENGINE_IMAGE_URL_PREFIX):
+        return
+    filename = image_url[len(ENGINE_IMAGE_URL_PREFIX):]
+    if not filename or os.path.basename(filename) != filename:
+        return
+    _remove_file(os.path.join(current_app.config["ENGINE_IMAGE_DIR"], filename))
+
+
+def _persist_engine(engine, image_upload, previous_image_url):
+    new_image_path = None
+    if image_upload:
+        try:
+            engine.image_url, new_image_path = _save_engine_image(image_upload)
+        except ValueError as exc:
+            db.session.rollback()
+            return api_error(str(exc))
+        except OSError:
+            db.session.rollback()
+            current_app.logger.exception("Could not save uploaded engine photo")
+            return api_error("The engine photo could not be saved. Check image storage and try again.", 500)
+
+    try:
+        db.session.commit()
+    except SQLAlchemyError:
+        db.session.rollback()
+        if new_image_path:
+            _remove_file(new_image_path)
+        current_app.logger.exception("Could not save engine catalog entry")
+        return api_error("The engine could not be saved. Please try again.", 500)
+
+    if previous_image_url != engine.image_url:
+        _remove_engine_image(previous_image_url)
+    return None
+
 
 SETTINGS_TEXT_FIELDS = [
     "company_name",
@@ -132,6 +208,12 @@ def _clean_engine(payload, engine=None):
     return engine
 
 
+def _engine_payload():
+    if request.mimetype == "multipart/form-data":
+        return request.form
+    return request.get_json(silent=True) or {}
+
+
 @bp.get("/admin/engines")
 @admin_required
 def list_all_engines():
@@ -142,7 +224,7 @@ def list_all_engines():
 @bp.post("/admin/engines")
 @admin_required
 def create_engine():
-    payload = request.get_json(silent=True) or {}
+    payload = _engine_payload()
     for required in ("make", "model_code", "title", "guide_price_usd"):
         if payload.get(required) in (None, ""):
             return api_error(f"{required.replace('_', ' ').title()} is required.")
@@ -155,7 +237,9 @@ def create_engine():
     if Engine.query.filter_by(make=engine.make, model_code=engine.model_code).first():
         return api_error("That make and model code already exists in the catalog.")
     db.session.add(engine)
-    db.session.commit()
+    error = _persist_engine(engine, _engine_image_upload(), None)
+    if error:
+        return error
     return jsonify({"engine": engine.to_dict()}), 201
 
 
@@ -165,13 +249,16 @@ def update_engine(engine_id):
     engine = db.session.get(Engine, engine_id)
     if not engine:
         return api_error("Engine not found.", 404)
+    previous_image_url = engine.image_url
     try:
-        _clean_engine(request.get_json(silent=True) or {}, engine)
+        _clean_engine(_engine_payload(), engine)
     except ValueError as exc:
         return api_error(f"Invalid value for {exc}.")
     if engine.guide_price_usd is None or engine.guide_price_usd <= 0:
         return api_error("Guide price must be greater than zero.")
-    db.session.commit()
+    error = _persist_engine(engine, _engine_image_upload(), previous_image_url)
+    if error:
+        return error
     return jsonify({"engine": engine.to_dict()})
 
 
@@ -189,6 +276,8 @@ def delete_engine(engine_id):
             "This engine appears on existing orders. Pause it from sourcing instead of "
             "deleting so order history stays intact."
         )
+    image_url = engine.image_url
     db.session.delete(engine)
     db.session.commit()
+    _remove_engine_image(image_url)
     return jsonify({"ok": True})

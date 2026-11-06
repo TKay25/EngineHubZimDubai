@@ -1,7 +1,7 @@
 """Flask application factory."""
 import os
 
-from flask import Flask, jsonify, render_template, send_from_directory
+from flask import Flask, current_app, jsonify, render_template, send_from_directory
 
 from config import BASE_DIR, Config, resolve_database_uri
 from manifest_utils import asset_urls, vite_dev
@@ -60,6 +60,10 @@ def create_app(test_config=None):
     @app.get("/robots.txt")
     def robots():
         return send_from_directory(app.static_folder, "robots.txt")
+
+    @app.get("/uploads/engines/<path:filename>")
+    def engine_image(filename):
+        return send_from_directory(current_app.config["ENGINE_IMAGE_DIR"], filename)
 
     @app.errorhandler(413)
     def too_large(_error):

@@ -44,6 +44,18 @@ STATUS_LABELS = {
     "cancelled": "Cancelled",
 }
 
+SOURCING_STATE_LABELS = {
+    "requested": "Checking Dubai availability",
+    "available": "Available — quote ready",
+    "garage_search": "Searching Dubai garages",
+    "reserved": "Reserved for you",
+    "sourcing": "Sourcing in Dubai",
+    "purchased": "Purchased from supplier",
+    "shipped": "In transit",
+    "customs_clearing": "Customs clearing",
+    "delivered": "Delivered",
+}
+
 PAYMENT_METHODS = ["paynow", "bank_transfer", "cash_on_delivery"]
 PAYMENT_METHOD_LABELS = {
     "paynow": "Paynow (EcoCash, OneMoney, ZIPIT, Visa/MC)",
@@ -260,6 +272,12 @@ class Order(db.Model):
     def balance_due(self):
         return round(max(self.total - self.paid_total, 0), 2)
 
+    def reserve_available_items(self):
+        """Lock in located units once the customer has paid the deposit."""
+        for item in self.items:
+            if item.sourcing_state == "available":
+                item.sourcing_state = "reserved"
+
     def to_dict(self, include_customer=False):
         data = {
             "id": self.id,
@@ -338,6 +356,10 @@ class OrderItem(db.Model):
             "unit_price_usd": float(self.unit_price_usd or 0),
             "line_total": self.line_total,
             "sourcing_state": self.sourcing_state,
+            "sourcing_state_label": SOURCING_STATE_LABELS.get(
+                self.sourcing_state,
+                (self.sourcing_state or "requested").replace("_", " ").title(),
+            ),
             "supplier": self.supplier,
             "supplier_ref": self.supplier_ref,
             "lot_number": self.lot_number,

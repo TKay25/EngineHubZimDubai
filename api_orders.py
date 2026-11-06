@@ -12,6 +12,7 @@ from flask import Blueprint, current_app, jsonify, request
 from auth_utils import admin_required, api_error, current_user, login_required
 from models import (
     ORDER_STATUSES,
+    SOURCING_STATE_LABELS,
     STATUS_LABELS,
     Engine,
     Order,
@@ -26,6 +27,7 @@ from config import get_settings
 bp = Blueprint("orders", __name__, url_prefix="/api")
 
 FULFILLMENT_OPTIONS = {"collected_dubai", "delivered_zimbabwe"}
+AVAILABILITY_STATES = {"requested", "available", "garage_search"}
 
 
 def new_reference():
@@ -191,6 +193,62 @@ def admin_orders():
     )
 
 
+@bp.patch("/admin/orders/<reference>/availability")
+@admin_required
+def set_availability(reference):
+    order = Order.query.filter_by(reference=reference).first()
+    if not order:
+        return api_error("Order not found.", 404)
+    if order.status not in ("quote_requested", "quoted", "deposit_paid", "sourcing"):
+        return api_error("Availability can no longer be changed at this order stage.")
+
+    data = request.get_json(silent=True) or {}
+    raw_items = data.get("items")
+    if not isinstance(raw_items, list) or not raw_items:
+        return api_error("Update at least one engine's Dubai availability.")
+
+    order_items = {item.id: item for item in order.items}
+    updates = []
+    seen = set()
+    for raw_item in raw_items:
+        if not isinstance(raw_item, dict):
+            return api_error("Invalid engine availability update.")
+        try:
+            item_id = int(raw_item.get("id"))
+        except (TypeError, ValueError):
+            return api_error("Invalid engine availability update.")
+        item = order_items.get(item_id)
+        if not item or item_id in seen:
+            return api_error("An engine line is missing or duplicated.")
+        seen.add(item_id)
+
+        state = str(raw_item.get("sourcing_state") or "").strip()
+        if state == "reserved" and item.sourcing_state == "reserved":
+            updates.append((item, state))
+        elif state in AVAILABILITY_STATES:
+            updates.append((item, state))
+        else:
+            return api_error(
+                "Choose checking availability, available, or searching Dubai garages."
+            )
+
+    for item, state in updates:
+        if state == "available" and order.status in ("deposit_paid", "sourcing"):
+            item.sourcing_state = "reserved"
+        else:
+            item.sourcing_state = state
+
+    summary = "; ".join(
+        f"{item.engine.title}: "
+        f"{SOURCING_STATE_LABELS.get(item.sourcing_state, item.sourcing_state)}"
+        for item, _state in updates
+    )
+    note = str(data.get("note") or "").strip() or f"Dubai availability update: {summary}"
+    order.events.append(OrderEvent(status=order.status, note=note[:255]))
+    db.session.commit()
+    return jsonify({"order": order.to_dict(include_customer=True)})
+
+
 @bp.patch("/admin/orders/<reference>/quote")
 @admin_required
 def set_quote(reference):
@@ -204,6 +262,23 @@ def set_quote(reference):
         raw_item = next(
             (i for i in data.get("items", []) if int(i.get("id", 0)) == item.id), None
         )
+        if item.sourcing_state == "garage_search":
+            return api_error(
+                "This engine is still being searched for in Dubai garages. "
+                "Update its availability before issuing the proforma."
+            )
+        if raw_item and raw_item.get("sourcing_state"):
+            sourcing_state = str(raw_item["sourcing_state"]).strip()
+            if sourcing_state == "garage_search":
+                return api_error(
+                    "This engine is still being searched for in Dubai garages. "
+                    "Update its availability before issuing the proforma."
+                )
+            if sourcing_state not in ("requested", "available", "reserved"):
+                return api_error("Invalid engine availability.")
+            if sourcing_state == "reserved" and item.sourcing_state != "reserved":
+                return api_error("An engine can only be reserved after its deposit is confirmed.")
+            item.sourcing_state = sourcing_state
         if not raw_item:
             continue
         try:
@@ -215,6 +290,10 @@ def set_quote(reference):
         item.unit_price_usd = price
         if raw_item.get("sourcing_state"):
             item.sourcing_state = str(raw_item["sourcing_state"])[:32]
+
+    for item in order.items:
+        if item.sourcing_state == "requested":
+            item.sourcing_state = "available"
 
     try:
         if data.get("freight") is not None:
@@ -269,6 +348,8 @@ def set_status(reference):
         return api_error(
             f"USD {order.balance_due:,.2f} is still outstanding. Confirm payment first."
         )
+    if status == "deposit_paid" and order.paid_total < order.deposit_due:
+        return api_error("Confirm the full deposit before reserving an available engine.")
 
     note = (data.get("note") or "").strip() or None
     order.status = status
@@ -277,6 +358,8 @@ def set_status(reference):
     if status in ("sourcing", "purchased"):
         for item in order.items:
             item.sourcing_state = status
+    elif status == "deposit_paid":
+        order.reserve_available_items()
     db.session.commit()
 
     notify_customer(order, status, extra=note)

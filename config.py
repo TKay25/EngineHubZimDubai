@@ -78,6 +78,9 @@ class Config:
     SESSION_COOKIE_SECURE = _bool("SESSION_COOKIE_SECURE", False)
     PERMANENT_SESSION_LIFETIME = timedelta(days=_int("SESSION_DAYS", 30))
     MAX_CONTENT_LENGTH = _int("MAX_UPLOAD_BYTES", 5 * 1024 * 1024)
+    ENGINE_IMAGE_DIR = os.getenv(
+        "ENGINE_IMAGE_DIR", os.path.join(BASE_DIR, "uploads", "engines")
+    )
 
     DEFAULT_CURRENCY = "USD"
 
