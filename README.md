@@ -123,6 +123,12 @@ Design system: **navy, white and gold**
 Typography: **Archivo** (display, uppercase micro-labels), **Inter Tight** (body),
 **Instrument Serif** italic (editorial emphasis). Numbers are tabular via `.mono`.
 
+## Advertising posters
+
+Twenty print-ready, 4:5 SVG posters and an A4 print sheet are in [`marketing/posters/`](./marketing/posters/).
+Open `index.html` to preview and download individual posters; image credits and licenses are listed in
+[`CREDITS.md`](./marketing/posters/CREDITS.md).
+
 ## Order lifecycle
 
 `quote_requested -> quoted -> deposit_paid -> sourcing -> purchased -> shipped -> customs_clearing -> delivered`
